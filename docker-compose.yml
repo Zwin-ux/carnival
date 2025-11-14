@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: echoid-postgres
+    environment:
+      POSTGRES_USER: echoid
+      POSTGRES_PASSWORD: carnival123
+      POSTGRES_DB: echoid_carnival
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U echoid"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - echoid-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: echoid-api
+    environment:
+      - DATABASE_URL=postgresql://echoid:carnival123@postgres:5432/echoid_carnival
+      - PORT=3001
+      - NODE_ENV=development
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - echoid-network
+    volumes:
+      - ./apps/api/src:/app/apps/api/src
+      - ./packages:/app/packages
+    command: pnpm --filter @echoid/api dev
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: echoid-web
+    environment:
+      - DATABASE_URL=postgresql://echoid:carnival123@postgres:5432/echoid_carnival
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - echoid-network
+    volumes:
+      - ./apps/web/app:/app/apps/web/app
+      - ./apps/web/src:/app/apps/web/src
+      - ./packages:/app/packages
+    command: pnpm --filter @echoid/web dev
+
+networks:
+  echoid-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

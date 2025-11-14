@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Carnival theme: warm bulbs, CRT artifacts, subdued candy colors */
+
+:root {
+  --bulb-glow: 0 0 22px;
+  --brass-gradient: linear-gradient(135deg, #f4c674 0%, #d3943f 45%, #8d3d2e 100%);
+  --aurora-gradient: radial-gradient(circle at 20% 20%, rgba(50, 215, 192, 0.35), transparent 55%),
+    radial-gradient(circle at 80% 0%, rgba(159, 110, 255, 0.3), transparent 45%);
+}
+
+body {
+  @apply bg-ink-950 text-candy-200 antialiased;
+  background-image:
+    var(--aurora-gradient),
+    radial-gradient(circle at bottom, rgba(244, 198, 116, 0.08), transparent 60%),
+    linear-gradient(120deg, #0b0d15 0%, #090b15 30%, #050308 100%);
+  background-attachment: fixed;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Scanline overlay effect */
+.scanlines {
+  position: relative;
+}
+
+.scanlines::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  opacity: 0.08;
+}
+
+/* Bulb glow effect */
+.bulb {
+  box-shadow: var(--bulb-glow) currentColor;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+/* Marquee border animation */
+.marquee-border {
+  position: relative;
+  overflow: hidden;
+  background: var(--brass-gradient);
+  box-shadow: var(--bulb-glow) rgba(243, 198, 116, 0.4);
+  background-size: 200% 200%;
+  animation: marquee 2s linear infinite;
+}
+
+.marquee-border::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: rgba(3, 3, 9, 0.9);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.marquee-border > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Focus rings with carnival theme */
+@layer base {
+  * {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-brass-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-ink-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-brass-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-brass-500;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  walletAddress String   @unique
+  displayName   String?
+  bio           String?
+  avatarUrl     String?
+  role          Role     @default(VISITOR)
+
+  // Relations
+  booths           Booth[]
+  sessionsAsClient Session[] @relation("ClientSessions")
+  sessionsAsExpert Session[] @relation("ExpertSessions")
+  reviewsGiven     Review[]  @relation("ReviewsGiven")
+  reviewsReceived  Review[]  @relation("ReviewsReceived")
+
+  @@index([walletAddress])
+  @@index([role])
+  @@map("users")
+}
+
+enum Role {
+  VISITOR
+  EXPERT
+  ADMIN
+}
+
+model Booth {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String   @unique
+  description String
+  pricePerMin Int // in smallest unit (wei, satoshi, etc)
+  active      Boolean  @default(true)
+  tags        String[]
+  trustScore  Float    @default(0)
+
+  // Relations
+  sessions Session[]
+
+  @@index([slug])
+  @@index([ownerId])
+  @@index([active])
+  @@map("booths")
+}
+
+model Session {
+  id          String        @id @default(cuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  boothId     String
+  booth       Booth         @relation(fields: [boothId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      User          @relation("ClientSessions", fields: [clientId], references: [id], onDelete: Cascade)
+  expertId    String
+  expert      User          @relation("ExpertSessions", fields: [expertId], references: [id], onDelete: Cascade)
+  status      SessionStatus @default(PENDING)
+  startedAt   DateTime?
+  endedAt     DateTime?
+  durationSec Int           @default(300) // 5 minutes default
+
+  // Relations
+  review Review?
+
+  @@index([boothId])
+  @@index([clientId])
+  @@index([expertId])
+  @@index([status])
+  @@map("sessions")
+}
+
+enum SessionStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELED
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  sessionId  String   @unique
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  fromUserId String
+  fromUser   User     @relation("ReviewsGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId   String
+  toUser     User     @relation("ReviewsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+  rating     Int // 1-5
+  comment    String?
+  payload    String // canonical JSON string for verification
+  payloadHash String  @unique // hex hash of payload
+  signature  String // base64 encoded signature
+  verified   Boolean  @default(false) // server-side signature verification result
+
+  @@index([payloadHash])
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@map("reviews")
+}
+
+model AuthChallenge {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  walletAddress String
+  nonce         String   @unique
+  message       String
+  expiresAt     DateTime
+
+  @@index([walletAddress])
+  @@map("auth_challenges")
+}
+
+model Attestation {
+  id              String          @id @default(cuid())
+  createdAt       DateTime        @default(now())
+  attestationId   String          @unique // KILT attestation ID
+  type            AttestationType
+  subjectAddress  String // Wallet address of subject
+  claimData       String // JSON string of claim
+  issuerAddress   String? // Wallet address of issuer
+  blockNumber     Int?
+  txHash          String?
+  verified        Boolean         @default(false)
+
+  @@index([attestationId])
+  @@index([subjectAddress])
+  @@index([type])
+  @@map("attestations")
+}
+
+enum AttestationType {
+  EXPERT_QUALIFICATION
+  SESSION_COMPLETION
+  TRUST_MILESTONE
+}
+
+model MerkleAnchor {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  merkleRoot  String   @unique
+  blockNumber Int?
+  txHash      String?
+  leafCount   Int
+  reviewHashes String[] // Array of review payload hashes in this tree
+
+  @@index([merkleRoot])
+  @@map("merkle_anchors")
+}
+
+model WheelMetric {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  filter    String   @unique
+  spins     Int      @default(0)
+  visits    Int      @default(0)
+
+  @@index([filter])
+  @@map("wheel_metrics")
+}
