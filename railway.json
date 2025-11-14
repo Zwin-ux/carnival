@@ -1,0 +1,75 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "project": {
+    "name": "echoid-carnival"
+  },
+  "defaultEnvironment": "production",
+  "environments": [
+    {
+      "name": "production",
+      "services": [
+        "postgres",
+        "api",
+        "web"
+      ]
+    }
+  ],
+  "plugins": {
+    "postgres": {
+      "name": "postgres",
+      "type": "postgres"
+    }
+  },
+  "services": [
+    {
+      "name": "postgres",
+      "type": "plugin",
+      "plugin": "postgres",
+      "variables": {
+        "DATABASE_URL": "{{ secrets.DATABASE_URL }}"
+      }
+    },
+    {
+      "name": "api",
+      "source": {
+        "type": "repository",
+        "repository": "https://github.com/Zwin-ux/carnival.git",
+        "branch": "main",
+        "directory": "apps/api"
+      },
+      "build": {
+        "type": "dockerfile",
+        "path": "apps/api/Dockerfile"
+      },
+      "deploy": {
+        "startCommand": "node apps/api/dist/index.js"
+      },
+      "variables": {
+        "DATABASE_URL": "{{ services.postgres.variables.DATABASE_URL }}",
+        "AUTH_JWT_SECRET": "{{ secrets.AUTH_JWT_SECRET }}",
+        "NEXT_PUBLIC_WS_PROVIDER": "wss://spiritnet.kilt.io"
+      }
+    },
+    {
+      "name": "web",
+      "source": {
+        "type": "repository",
+        "repository": "https://github.com/Zwin-ux/carnival.git",
+        "branch": "main",
+        "directory": "apps/web"
+      },
+      "build": {
+        "type": "dockerfile",
+        "path": "apps/web/Dockerfile"
+      },
+      "deploy": {
+        "startCommand": "pnpm --filter @echoid/web start"
+      },
+      "variables": {
+        "AUTH_JWT_SECRET": "{{ secrets.AUTH_JWT_SECRET }}",
+        "NEXT_PUBLIC_API_URL": "https://{{ services.api.domain }}",
+        "NEXT_PUBLIC_WS_PROVIDER": "wss://spiritnet.kilt.io"
+      }
+    }
+  ]
+}
