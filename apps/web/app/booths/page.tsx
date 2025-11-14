@@ -1,6 +1,6 @@
 ﻿import Link from "next/link";
 import { prisma } from "@echoid/db";
-import { BoothCard } from "@echoid/ui";
+import { BoothCard, GlassPanel, HoloBadge, NeoButton } from "@echoid/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -27,28 +27,33 @@ export default async function BoothsPage({ searchParams }: BoothsPageProps) {
   const allTags = Array.from(new Set(booths.flatMap((b) => b.tags))).sort();
 
   return (
-    <main className="flex-1 px-4 py-10">
-      <div className="mx-auto max-w-6xl space-y-10">
-        <section className="rounded-3xl border border-ink-800 bg-ink-900/80 p-8 shadow-panel-glow">
-          <p className="text-xs uppercase tracking-[0.35em] text-steel-400">Browse experts</p>
-          <div className="mt-2 flex flex-wrap items-baseline gap-4">
-            <h1 className="text-4xl font-carnival text-candy-200 drop-shadow-marquee">All Booths</h1>
-            <span className="rounded-full border border-brass-400/40 px-3 py-1 text-xs text-brass-200">
-              {booths.length} open experiences
-            </span>
+    <main className="flex-1 px-4 py-12">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <GlassPanel depth="lg" padding="lg" accent="graphite" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-data uppercase tracking-[0.35em] text-mist-400">Browse experts</p>
+              <h1 className="font-heading text-4xl text-ice-100">All Booths</h1>
+            </div>
+            <HoloBadge tone="plasma" label="Open" meta={`${booths.length} live`} />
           </div>
-          <p className="mt-3 max-w-3xl text-sm text-candy-200/70">
-            Brass-lit workstations, neon signage, and verifiable credentials. Filter by tag to find the perfect Web3 guide.
+          <p className="max-w-3xl text-sm text-ice-300/80">
+            Layered gunmetal staging, plasma cyan overlays, verifiable credentials. Filter by tag to pinpoint the right Web3 guide.
           </p>
-        </section>
+          {tag && (
+            <Link href="/booths" className="inline-flex">
+              <NeoButton variant="graphite" size="sm">
+                Clear filters
+              </NeoButton>
+            </Link>
+          )}
+        </GlassPanel>
 
         {allTags.length > 0 && (
-          <div className="flex flex-wrap gap-3">
+          <div className="holo-toolbar flex flex-wrap gap-2 px-4 py-3 text-xs font-data uppercase tracking-[0.25em]">
             <Link
               href="/booths"
-              className={`rounded-full px-4 py-2 text-sm transition-colors ${
-                !tag ? "bg-brass-500 text-ink-950" : "border border-ink-700 text-candy-200"
-              }`}
+              className={`rounded-full px-4 py-1 transition ${!tag ? "bg-plasma-500/20 text-plasma-200" : "text-ice-300/70"}`}
             >
               All
             </Link>
@@ -56,8 +61,8 @@ export default async function BoothsPage({ searchParams }: BoothsPageProps) {
               <Link
                 key={t}
                 href={`/booths?tag=${t}`}
-                className={`rounded-full px-4 py-2 text-sm transition-colors ${
-                  tag === t ? "bg-aurora-400/90 text-ink-950" : "border border-ink-700 text-candy-200/80"
+                className={`rounded-full px-4 py-1 transition ${
+                  tag === t ? "bg-nova-500/20 text-nova-200" : "text-ice-300/70"
                 }`}
               >
                 #{t}
@@ -85,9 +90,9 @@ export default async function BoothsPage({ searchParams }: BoothsPageProps) {
         </div>
 
         {booths.length === 0 && (
-          <div className="rounded-3xl border border-ink-800 bg-ink-900/80 p-8 text-center text-sm text-candy-200/70">
-            {tag ? `No booths found for “${tag}”` : "No booths available yet."}
-          </div>
+          <GlassPanel depth="md" padding="lg" accent="graphite" className="text-center text-sm text-ice-300/80">
+            {tag ? `No booths found for "${tag}".` : "No booths available yet."}
+          </GlassPanel>
         )}
       </div>
     </main>

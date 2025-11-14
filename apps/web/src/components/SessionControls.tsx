@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { toast } from "sonner";
-import { TicketButton, TimerDisplay } from "@echoid/ui";
+import { GlassPanel, NeoButton, TimerDisplay } from "@echoid/ui";
 import { useWallet } from "@/providers/WalletProvider";
 
 interface SessionControlsProps {
@@ -133,9 +133,9 @@ export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: S
 
   if (!selectedAccount) {
     return (
-      <div className="text-center text-sm text-candy-200/70">
+      <GlassPanel depth="sm" padding="md" accent="graphite" className="text-center text-sm text-ice-300/80">
         Connect your Polkadot wallet to reserve a slot.
-      </div>
+      </GlassPanel>
     );
   }
 
@@ -147,16 +147,16 @@ export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: S
         transition={reduceMotion ? undefined : { duration: 0.4 }}
         className="space-y-4"
       >
-        <div className="rounded-3xl border border-ink-800 bg-ink-900/70 p-6 text-center shadow-panel-glow">
-          <p className="text-xs uppercase tracking-[0.4em] text-steel-400">Live session</p>
-          <div className="mt-4 flex flex-col items-center gap-4">
+        <GlassPanel depth="md" padding="lg" accent="plasma" className="text-center space-y-4">
+          <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Live session</p>
+          <div className="flex flex-col items-center gap-4">
             <TimerDisplay durationSec={300} autoStart onComplete={endSession} />
-            <p className="text-xs text-steel-300">Server tracks precise duration for billing.</p>
-            <TicketButton onClick={endSession} variant="danger" disabled={isLoading}>
+            <p className="text-xs text-ice-300/70">Server tracks precise duration for billing.</p>
+            <NeoButton variant="nova" onClick={endSession} disabled={isLoading}>
               {isLoading ? "Ending..." : "End Session"}
-            </TicketButton>
+            </NeoButton>
           </div>
-        </div>
+        </GlassPanel>
       </motion.div>
     );
   }
@@ -169,31 +169,30 @@ export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: S
       className="space-y-4"
     >
       {error && (
-        <div className="rounded-2xl border border-rust-500/40 bg-rust-500/10 px-4 py-3 text-sm text-rust-200" aria-live="assertive">
+        <div className="rounded-2xl border border-status-danger/30 bg-status-danger/10 px-4 py-3 text-sm text-status-danger" aria-live="assertive">
           {error}
         </div>
       )}
 
-      <div className="rounded-3xl border border-ink-800 bg-ink-900/70 p-6 shadow-panel-glow">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <GlassPanel depth="md" padding="lg" accent="graphite">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-steel-400">Five-minute consult</p>
-            <p className="text-3xl font-mono text-aurora-300">
+            <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Five-minute consult</p>
+            <p className="font-data text-3xl text-plasma-300">
               {pricePerMin * 5}
-              <span className="text-base text-aurora-300/70"> tokens</span>
+              <span className="text-base text-ice-300/70"> tokens</span>
             </p>
-            <p className="text-xs text-steel-400">{pricePerMin} tokens / min · mock escrow</p>
+            <p className="text-xs text-ice-300/70">{pricePerMin} tokens / min - mock escrow</p>
           </div>
-          <TicketButton onClick={startSession} disabled={isLoading} icon={<span>??</span>}>
+          <NeoButton onClick={startSession} disabled={isLoading}>
             {isLoading ? "Starting..." : "Book Session"}
-          </TicketButton>
+          </NeoButton>
         </div>
-      </div>
+      </GlassPanel>
 
-      <p className="text-xs text-steel-400">
-        We’ll prompt you to sign an attested review immediately after the call—keeping the carnival trust loop alive.
+      <p className="text-xs text-ice-300/70">
+        We&apos;ll prompt you to sign an attested review immediately after the call, keeping the trust loop alive.
       </p>
     </motion.div>
   );
 }
-

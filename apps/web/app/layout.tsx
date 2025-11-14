@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
 import "@fontsource/righteous";
 import "./globals.css";
 import { WalletProvider } from "@/providers/WalletProvider";
 import { Header } from "@/components/Header";
 import { Toaster } from "sonner";
+import { bodyMono, bodySans, dataGrotesk, headingDisplay } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "EchoID Carnival - Rent-A-Brain",
@@ -18,8 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-      <body className="scanlines">
+    <html
+      lang="en"
+      className={`${bodySans.variable} ${bodyMono.variable} ${headingDisplay.variable} ${dataGrotesk.variable}`}
+    >
+      <body className="holo-body font-sans text-ice-100 antialiased">
         <WalletProvider>
           <div className="min-h-screen flex flex-col">
             <Header />

@@ -1,5 +1,5 @@
 import { prisma } from "@echoid/db";
-import { BoothCard } from "@echoid/ui";
+import { BoothCard, GlassPanel, HoloBadge } from "@echoid/ui";
 import { MidwayHero } from "@/components/MidwayHero";
 import { FortuneWheel } from "@/components/FortuneWheel";
 
@@ -56,21 +56,40 @@ export default async function HomePage() {
   );
 
   return (
-    <main className="flex-1">
+    <main className="flex-1 space-y-16">
       <MidwayHero primaryCtaHref="/booths" secondaryCtaHref="/dashboard" />
 
-      <section className="px-4 py-12">
-        <div className="mx-auto max-w-5xl">
-          <FortuneWheel booths={featuredBooths} initialStats={wheelStats} tagFilters={tagFilters} />
+      <section className="holo-section px-4">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row">
+          <div className="flex-1">
+            <GlassPanel depth="lg" padding="lg" accent="graphite" className="h-full">
+              <FortuneWheel booths={featuredBooths} initialStats={wheelStats} tagFilters={tagFilters} />
+            </GlassPanel>
+          </div>
+          <GlassPanel depth="sm" padding="lg" accent="plasma" className="lg:w-80">
+            <div className="space-y-3 text-left">
+              <HoloBadge tone="plasma" label="Live Metrics" meta="Updated in real-time" />
+              <p className="text-lg font-heading text-ice-100">Fortune Wheel v2</p>
+              <p className="text-sm text-ice-300/80">
+                Micro-texture background, holo orb tilt, and SVG-driven trust meters keep spins grounded in telemetry.
+              </p>
+            </div>
+            <div className="mt-6 space-y-3 text-sm text-ice-300/70">
+              <p>- Adaptive routing between wallet-only and credential-only filters.</p>
+              <p>- Particle shader engages only on hero & dashboard to protect perf.</p>
+            </div>
+          </GlassPanel>
         </div>
       </section>
 
-      <section className="px-4 py-16">
+      <section className="holo-section px-4">
         <div className="mx-auto max-w-6xl space-y-8">
-          <div className="text-center">
-            <p className="text-xs uppercase tracking-[0.35em] text-steel-400">Trusted performers</p>
-            <h2 className="text-5xl font-carnival text-brass-400 drop-shadow-lg">Featured Booths</h2>
-            <p className="mt-2 text-sm text-candy-200/70">High-signal experts with verifiable reviews.</p>
+          <div className="accent-spine space-y-2 text-left">
+            <HoloBadge tone="nova" label="Marketplace" meta="Booth Grid" />
+            <h2 className="font-heading text-4xl text-ice-100">Featured Booths</h2>
+            <p className="max-w-2xl text-sm text-ice-300/75">
+              Each card surfaces trust data, availability, and credential capsules inside glassmorphism shells.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -94,8 +113,9 @@ export default async function HomePage() {
           </div>
 
           {featuredBooths.length === 0 && (
-            <p className="text-center text-candy-200/40">
-              No booths available. Run <code className="rounded bg-ink-800 px-2 py-1">pnpm db:seed</code> to populate demo data.
+            <p className="text-center text-ice-300/40">
+              No booths available. Run{" "}
+              <code className="rounded bg-graphite-900/80 px-2 py-1 text-ice-100">pnpm db:seed</code> to populate demo data.
             </p>
           )}
         </div>

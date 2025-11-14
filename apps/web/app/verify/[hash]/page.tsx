@@ -1,4 +1,7 @@
-﻿interface VerifyResponse {
+import { ShieldCheck, TriangleAlert, Star } from "lucide-react";
+import { GlassPanel, HoloBadge } from "@echoid/ui";
+
+interface VerifyResponse {
   verified: boolean;
   error?: string;
   review?: {
@@ -42,12 +45,15 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
   if (!data || !data.verified || !review || !verification) {
     return (
       <main className="flex-1 px-4 py-12">
-        <div className="mx-auto max-w-2xl">
-          <div className="rounded-lg border-2 border-rust-500 bg-ink-800 p-8 text-center">
-            <div className="mb-4 text-6xl">✗</div>
-            <h1 className="mb-4 text-3xl font-bold text-rust-400">Verification Failed</h1>
-            <p className="text-candy-200/60">{data?.error || "Could not verify this review hash"}</p>
-          </div>
+        <div className="mx-auto max-w-3xl space-y-6">
+          <GlassPanel depth="lg" padding="lg" accent="nova" className="text-center space-y-4">
+            <TriangleAlert className="mx-auto h-12 w-12 text-nova-200" />
+            <div>
+              <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Verification failed</p>
+              <h1 className="font-heading text-3xl text-ice-100">Unable to verify review</h1>
+            </div>
+            <p className="text-sm text-ice-300/80">{data?.error || "Could not verify this review hash."}</p>
+          </GlassPanel>
         </div>
       </main>
     );
@@ -55,52 +61,61 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
 
   return (
     <main className="flex-1 px-4 py-12">
-      <div className="mx-auto max-w-2xl">
-        <div className="rounded-lg border-2 border-mint-400 bg-ink-800 p-8">
-          <div className="mb-8 text-center">
-            <div className="mb-4 text-6xl">✓</div>
-            <h1 className="mb-2 text-3xl font-bold text-mint-300">Review Verified</h1>
-            <p className="text-candy-200/60">This review has been cryptographically verified</p>
+      <div className="mx-auto max-w-3xl space-y-6">
+        <GlassPanel depth="lg" padding="lg" accent="plasma" className="text-center space-y-3">
+          <ShieldCheck className="mx-auto h-12 w-12 text-plasma-200" />
+          <div>
+            <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Review verified</p>
+            <h1 className="font-heading text-3xl text-ice-100">Cryptographic proof intact</h1>
+          </div>
+          <p className="text-sm text-ice-300/80">This review hash and signature matched the attested payload.</p>
+        </GlassPanel>
+
+        <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-data uppercase tracking-[0.3em] text-mist-400">Booth</p>
+              <p className="font-heading text-2xl text-ice-100">{review.booth.title}</p>
+            </div>
+            <HoloBadge tone="plasma" label="Rating" meta={`${review.rating}/5`} />
           </div>
 
-          <div className="space-y-6">
-            <div>
-              <h3 className="mb-2 text-sm font-bold text-brass-400">Booth</h3>
-              <p className="text-candy-200">{review.booth.title}</p>
-            </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <ReviewerBlock label="From" {...review.from} />
+            <ReviewerBlock label="To" {...review.to} />
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <ReviewerBlock label="From" {...review.from} />
-              <ReviewerBlock label="To" {...review.to} />
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-sm font-bold text-brass-400">Rating</h3>
-              <div className="flex gap-1">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <span key={index} className={index < review.rating ? "text-brass-400" : "text-ink-700"}>
-                    ★
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {review.comment && (
-              <div>
-                <h3 className="mb-2 text-sm font-bold text-brass-400">Comment</h3>
-                <p className="text-candy-200/80">{review.comment}</p>
-              </div>
-            )}
-
-            <div className="border-t border-brass-600/30 pt-6">
-              <h3 className="mb-2 text-sm font-bold text-brass-400">Verification Details</h3>
-              <div className="space-y-2 text-sm">
-                <VerificationRow label="Hash Match" passed={verification.hashMatches} />
-                <VerificationRow label="Signature Valid" passed={verification.signatureValid} />
-              </div>
+          <div>
+            <p className="text-xs font-data uppercase tracking-[0.3em] text-mist-400">Stars</p>
+            <div className="mt-2 flex gap-1" aria-label={`Rating ${review.rating} out of 5`}>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Star
+                  key={index}
+                  className={`h-5 w-5 ${index < review.rating ? "text-plasma-200" : "text-graphite-600"}`}
+                  fill="currentColor"
+                />
+              ))}
             </div>
           </div>
-        </div>
+
+          {review.comment && (
+            <div>
+              <p className="text-xs font-data uppercase tracking-[0.3em] text-mist-400">Comment</p>
+              <p className="mt-2 text-sm text-ice-300/80">{review.comment}</p>
+            </div>
+          )}
+        </GlassPanel>
+
+        <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-data uppercase tracking-[0.3em] text-mist-400">Verification details</p>
+            <HoloBadge tone="plasma" label="Hash" meta={hash.slice(0, 8)} />
+          </div>
+          <div className="space-y-3 text-sm text-ice-300/80">
+            <VerificationRow label="Hash match" passed={verification.hashMatches} />
+            <VerificationRow label="Signature valid" passed={verification.signatureValid} />
+          </div>
+        </GlassPanel>
       </div>
     </main>
   );
@@ -108,19 +123,19 @@ export default async function VerifyPage({ params }: VerifyPageProps) {
 
 function ReviewerBlock({ label, displayName, walletAddress }: { label: string; displayName: string; walletAddress: string }) {
   return (
-    <div>
-      <h3 className="mb-2 text-sm font-bold text-brass-400">{label}</h3>
-      <p className="text-candy-200">{displayName}</p>
-      <p className="truncate font-mono text-xs text-candy-200/40">{walletAddress}</p>
+    <div className="rounded-2xl border border-graphite-700/60 bg-graphite-900/50 p-4">
+      <p className="text-xs font-data uppercase tracking-[0.3em] text-mist-400">{label}</p>
+      <p className="mt-1 text-ice-100">{displayName}</p>
+      <p className="truncate font-mono text-xs text-ice-300/60">{walletAddress}</p>
     </div>
   );
 }
 
 function VerificationRow({ label, passed }: { label: string; passed: boolean }) {
   return (
-    <div className="flex justify-between">
-      <span className="text-candy-200/60">{label}:</span>
-      <span className={passed ? "text-mint-300" : "text-rust-400"}>{passed ? "✓ Pass" : "✗ Fail"}</span>
+    <div className="flex items-center justify-between rounded-2xl border border-graphite-700/50 bg-graphite-900/40 px-4 py-3">
+      <span className="text-ice-300/70">{label}</span>
+      <span className={passed ? "text-plasma-200" : "text-nova-200"}>{passed ? "Pass" : "Fail"}</span>
     </div>
   );
 }

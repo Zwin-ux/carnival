@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { Star } from "lucide-react";
 import { toast } from "sonner";
-import { TicketButton } from "@echoid/ui";
+import { GlassPanel, HoloBadge, NeoButton } from "@echoid/ui";
 import { canonicalJson } from "@echoid/core";
 import { celebrateSuccess } from "@/utils/confetti";
 import { useWallet } from "@/providers/WalletProvider";
@@ -67,7 +68,7 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
       setSuccess(true);
       celebrateSuccess();
 
-      let description = `Trust score: ${trustScore.previous.toFixed(1)} ? ${trustScore.current.toFixed(1)}`;
+      let description = `Trust score: ${trustScore.previous.toFixed(1)} -> ${trustScore.current.toFixed(1)}`;
       if (attestation) {
         description += `\nSession attestation created (Block ${attestation.blockNumber})`;
       }
@@ -93,11 +94,12 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={reduceMotion ? undefined : { duration: 0.5, ease: "easeOut" }}
-        className="space-y-3 rounded-3xl border border-mint-400/40 bg-gradient-to-br from-mint-400/20 to-brass-400/20 p-8 text-center shadow-panel-glow"
       >
-        <div className="text-6xl">?</div>
-        <p className="text-2xl font-carnival text-mint-200">Review anchored!</p>
-        <p className="text-sm text-candy-200/70">Thanks for keeping the carnival trust loop alive.</p>
+        <GlassPanel depth="md" padding="lg" accent="plasma" className="space-y-3 text-center">
+          <div className="text-4xl">*</div>
+          <p className="text-2xl font-heading text-ice-100">Review anchored</p>
+          <p className="text-sm text-ice-300/75">Thanks for keeping the graph glowing.</p>
+        </GlassPanel>
       </motion.div>
     );
   }
@@ -107,54 +109,61 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={reduceMotion ? undefined : { duration: 0.5 }}
-      className="space-y-5 rounded-3xl border border-ink-800 bg-ink-900/80 p-6 shadow-panel-glow"
     >
-      <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-steel-400">Signed Kudos</p>
-        <h3 className="text-2xl font-carnival text-brass-300">Leave a review</h3>
-      </div>
-
-      {error && (
-        <div className="rounded-2xl border border-rust-500/40 bg-rust-500/10 px-4 py-3 text-sm text-rust-200" aria-live="assertive">
-          {error}
+      <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Signed kudos</p>
+            <h3 className="font-heading text-2xl text-ice-100">Leave a review</h3>
+          </div>
+          <HoloBadge tone="plasma" label="Attested" />
         </div>
-      )}
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-candy-200/80">Rating</label>
-        <div className="flex flex-wrap gap-3">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <motion.button
-              key={star}
-              type="button"
-              whileHover={reduceMotion ? undefined : { scale: 1.1 }}
-              whileTap={reduceMotion ? undefined : { scale: 0.95 }}
-              onClick={() => setRating(star)}
-              className={`text-4xl transition-colors ${star <= rating ? "text-brass-300" : "text-ink-700"}`}
-            >
-              ?
-              <span className="block text-xs text-steel-400">{ratingLabels[star - 1]}</span>
-            </motion.button>
-          ))}
+        {error && (
+          <div className="rounded-2xl border border-status-danger/30 bg-status-danger/10 px-4 py-3 text-sm text-status-danger" aria-live="assertive">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-ice-200">Rating</label>
+          <div className="flex flex-wrap gap-3">
+            {[1, 2, 3, 4, 5].map((star) => {
+              const isActive = star <= rating;
+              return (
+                <motion.button
+                  key={star}
+                  type="button"
+                  whileHover={reduceMotion ? undefined : { scale: 1.05 }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.96 }}
+                  onClick={() => setRating(star)}
+                  className={`w-28 rounded-2xl border px-3 py-2 text-center ${isActive ? "border-plasma-400/60 bg-plasma-400/10 text-plasma-200" : "border-graphite-700/70 bg-graphite-900/50 text-ice-300/70"}`}
+                >
+                  <Star className="mx-auto h-6 w-6" fill="currentColor" />
+                  <span className="mt-1 block text-xs text-ice-300/70">{ratingLabels[star - 1]}</span>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-candy-200/80">Comment</label>
-        <textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          maxLength={1000}
-          rows={4}
-          className="w-full rounded-2xl border border-ink-700 bg-ink-950/70 px-4 py-3 text-sm text-candy-200 placeholder:text-candy-200/30"
-          placeholder="What stood out about this expert?"
-        />
-        <p className="text-right text-xs text-steel-500">{comment.length}/1000</p>
-      </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-ice-200">Comment</label>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            maxLength={1000}
+            rows={4}
+            className="w-full rounded-2xl border border-graphite-700/70 bg-graphite-950/70 px-4 py-3 text-sm text-ice-100 placeholder:text-ice-300/30"
+            placeholder="What stood out about this expert?"
+          />
+          <p className="text-right text-xs text-ice-300/60">{comment.length}/1000</p>
+        </div>
 
-      <TicketButton onClick={submitReview} disabled={isSubmitting || !selectedAccount}>
-        {isSubmitting ? "Submitting..." : "Sign & anchor review"}
-      </TicketButton>
+        <NeoButton onClick={submitReview} disabled={isSubmitting || !selectedAccount} loading={isSubmitting} fullWidth>
+          {isSubmitting ? "Submitting" : "Sign & Anchor Review"}
+        </NeoButton>
+      </GlassPanel>
     </motion.div>
   );
 }
