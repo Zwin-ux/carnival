@@ -17,10 +17,12 @@ import { Badge } from "@/components/ui/badge";
 import { TicketButton } from "@/components/ui/ticket-button";
 import { BoothCard, BoothCardContent } from "@/components/ui/booth-card";
 
+const easeOutExpo = [0.16, 1, 0.3, 1] as const;
+
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  transition: { duration: 0.6, ease: easeOutExpo },
 };
 
 const flows = [
@@ -74,7 +76,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.8, ease: easeOutExpo }}
           className="mx-auto max-w-5xl text-center"
         >
           <Badge className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-xs uppercase tracking-[0.3em] text-[#00D1FF] shadow-[0_0_16px_rgba(0,209,255,0.35)]">
@@ -144,11 +146,11 @@ export default function Home() {
 
           <div className="grid gap-6 md:grid-cols-3">
             {flows.map(({ title, description, icon: Icon }) => (
-              <motion.div
-                key={title}
-                className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5/10 p-6 text-left shadow-[0_20px_50px_rgba(199,125,255,0.12)]"
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                <motion.div
+                  key={title}
+                  className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5/10 p-6 text-left shadow-[0_20px_50px_rgba(199,125,255,0.12)]"
+                  whileHover={{ y: -6 }}
+                  transition={{ duration: 0.35, ease: easeOutExpo }}
               >
                 <span className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#C77DFF_0%,#00D1FF_100%)]/70 text-white">
                   <Icon className="h-6 w-6" />
