@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, Target, Trophy, Sparkles } from "lucide-react";
@@ -7,6 +8,7 @@ import { QuestCard } from "@/components/quests/QuestCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TicketButton } from "@/components/ui/ticket-button";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 
@@ -170,13 +172,26 @@ export default function QuestsPage() {
   if (!userAddress) {
     return (
       <div className="min-h-screen py-20 px-6 flex items-center justify-center">
-        <Card className="border-2 border-carnival-twist/30 bg-carnival-canvas/70 backdrop-blur-sm">
-          <CardContent className="p-12 text-center">
-            <Target className="w-16 h-16 mx-auto mb-4 text-carnival-twist" />
-            <h2 className="text-2xl font-bold text-white mb-2">No Ticket Found</h2>
+        <Card className="border border-white/10 bg-[#050111]/80 backdrop-blur-md">
+          <CardContent className="p-10 text-center space-y-4">
+            <Target className="w-16 h-16 mx-auto text-[#00D1FF]" />
+            <h2 className="text-2xl font-bold text-white">Wallet not detected</h2>
             <p className="text-white/70">
-              Please connect your wallet to access carnival quests
+              Connect your Polkadot wallet in the builder to unlock quest tracking.
             </p>
+            <div className="pt-4">
+              <TicketButton asChild size="md" variant="primary" className="w-full justify-center">
+                <Link href="/builder">Open builder</Link>
+              </TicketButton>
+              <Link
+                href="/docs/GETTING_STARTED.md#quests"
+                className="mt-3 inline-flex items-center justify-center text-sm text-[#00D1FF] underline-offset-4 hover:underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Read quest setup guide
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Wallet2,
@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   CircuitBoard,
   Gamepad2,
+  Eye,
   Star,
   Activity,
   ArrowRight,
@@ -30,10 +31,12 @@ const fadeUp = {
 const flows = [
   {
     title: "Connect Wallet",
-    description: "Link Polkadot.js once and get a signed midway ticket.",
+    description: "Link Polkadot.js once and cache a signer for the build.",
     icon: Wallet2,
     accent: "linear-gradient(90deg,#FF6FD8 0%,#C77DFF 100%)",
     href: "/builder#connect",
+    subtitle: "Wallet connect",
+    badgeIcon: Wallet2,
   },
   {
     title: "Craft Avatar",
@@ -41,6 +44,8 @@ const flows = [
     icon: Layers3,
     accent: "linear-gradient(90deg,#C77DFF 0%,#7F5BFF 100%)",
     href: "/builder#avatar",
+    subtitle: "Avatar preview",
+    badgeIcon: Eye,
   },
   {
     title: "Mint & Anchor",
@@ -48,6 +53,8 @@ const flows = [
     icon: CircuitBoard,
     accent: "linear-gradient(90deg,#00D1FF 0%,#5BC0FF 100%)",
     href: "/dashboard#anchor",
+    subtitle: "Anchor proofs",
+    badgeIcon: ShieldCheck,
   },
 ];
 
@@ -76,10 +83,25 @@ const stats = [
 ];
 
 export default function Home() {
+  const [isLargeViewport, setIsLargeViewport] = useState(false);
+
   const handleScrollToFlow = useCallback(() => {
     const section = document.getElementById("flow");
     section?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleResize = () => setIsLargeViewport(window.innerWidth >= 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const secondaryCtaText = isLargeViewport ? "See Flow" : "Scroll to Flow";
+  const secondaryCtaAriaLabel = isLargeViewport
+    ? "See the three-step flow overview"
+    : "Scroll to the flow overview section";
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050014] via-[#02000A] to-[#000008] text-white">
@@ -111,13 +133,13 @@ export default function Home() {
             <div className="absolute -inset-12 mx-auto h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,#5B2FFF,transparent_65%)] opacity-70 blur-[150px]" aria-hidden />
             <div className="relative rounded-[36px] border border-white/10 bg-white/5/10 px-8 py-12 shadow-[0_30px_120px_rgba(5,0,30,0.75)] backdrop-blur-3xl sm:px-12">
               <h1 className="font-heading text-[2.75rem] font-semibold leading-tight text-white md:text-6xl lg:text-[4.75rem]">
-                Identity is your midway.
+                Ship a Polkadot-ready identity.
                 <span className="block bg-[linear-gradient(135deg,#C77DFF_0%,#00D1FF_100%)] bg-clip-text text-transparent">
-                  Bonelli Identity keeps the lights on.
+                  Connect, customize, and anchor in one place.
                 </span>
               </h1>
               <p className="font-body mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/80 md:text-[1.25rem]">
-                Connect your Polkadot wallet, create an avatar, and anchor proofs in one run. Simple steps, same trusted tooling.
+                Use your Polkadot wallet to build an avatar, package metadata, and anchor proofs without juggling extra tools.
               </p>
               <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
                 <TicketButton
@@ -126,15 +148,15 @@ export default function Home() {
                   size="lg"
                   className="rounded-full px-10 text-base shadow-[0_0_30px_rgba(199,125,255,0.45)] transition hover:scale-[1.02]"
                 >
-                  <Link href="/builder">Enter the Builder</Link>
+                  <Link href="/builder">Start Building</Link>
                 </TicketButton>
                 <button
                   type="button"
                   onClick={handleScrollToFlow}
                   className="group inline-flex items-center gap-2 rounded-full border border-[#00D1FF]/40 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 shadow-[0_0_30px_rgba(0,209,255,0.25)] transition hover:scale-[1.02] hover:border-[#00D1FF]/70 hover:text-white"
-                  aria-label="Scroll to see how the Bonelli Identity flow works"
+                  aria-label={secondaryCtaAriaLabel}
                 >
-                  Explore the Flow
+                  {secondaryCtaText}
                   <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </button>
               </div>

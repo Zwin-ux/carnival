@@ -139,17 +139,17 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="min-h-screen py-20 px-6 flex items-center justify-center">
-        <Card className="border-2 border-carnival-twist/30 bg-carnival-canvas/70 backdrop-blur-sm">
+        <Card className="border border-white/10 bg-[#050111]/85 backdrop-blur">
           <CardContent className="p-12 text-center">
-            <Shield className="w-16 h-16 mx-auto mb-4 text-carnival-twist" />
-            <h2 className="text-2xl font-bold text-white mb-2">Booth Closed</h2>
+            <Shield className="w-16 h-16 mx-auto mb-4 text-[#00D1FF]" />
+            <h2 className="text-2xl font-bold text-white mb-2">Profile not found</h2>
             <p className="text-white/70 mb-6">
-              This profile booth doesn't exist at the midway
+              We couldn&apos;t locate this Polkadot identity.
             </p>
             <Link href="/explore">
               <Button className="bg-gradient-to-r from-carnival-marquee to-carnival-twist hover:from-carnival-marquee/80 hover:to-carnival-twist/80">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Midway
+                Browse profiles
               </Button>
             </Link>
           </CardContent>
@@ -199,8 +199,8 @@ export default function ProfilePage() {
                   </Avatar>
 
                   {/* Handle */}
-                  <h1 className="text-2xl font-bold carnival-text drop-shadow-lg mb-2">
-                    {profile.handle}
+                  <h1 className="text-2xl font-bold text-white drop-shadow mb-2">
+                    {profile.handle} <span className="text-white/60 font-normal">· Polkadot identity</span>
                   </h1>
 
                   {/* Address with Copy */}
@@ -271,7 +271,7 @@ export default function ProfilePage() {
                     className="mx-auto"
                   />
                   <p className="text-center text-xs text-carnival-ink mt-2 font-semibold">
-                    🎫 Scan to visit booth
+                    Scan to view profile
                   </p>
                 </div>
               </CardContent>
@@ -288,7 +288,7 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-white/80 leading-relaxed">
-                    {profile.bio || "This carnival-goer hasn't added a bio yet."}
+                    {profile.bio || "No bio provided yet."}
                   </p>
                 </CardContent>
               </Card>
@@ -368,7 +368,7 @@ export default function ProfilePage() {
                 <CardContent>
                   {attestations.length === 0 ? (
                     <p className="text-white/70 text-center py-8">
-                      No attestations at this booth yet
+                      No attestations recorded yet.
                     </p>
                   ) : (
                     <div className="space-y-4">

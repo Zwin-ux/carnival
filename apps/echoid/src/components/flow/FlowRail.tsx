@@ -12,6 +12,8 @@ type FlowStepConfig = {
   icon: LucideIcon;
   accent: string;
   href?: string;
+  subtitle?: string;
+  badgeIcon?: LucideIcon;
 };
 
 interface FlowRailProps {
@@ -32,7 +34,7 @@ export function FlowRail({ steps }: FlowRailProps) {
           <div className="mx-auto mb-14 max-w-3xl text-center">
             <p className="text-xs uppercase tracking-[0.55em] text-white/45">Identity Flow</p>
             <h2 className="font-heading mt-5 text-[2.25rem] font-semibold text-white md:text-[3rem]">
-              Wallet → Avatar → Anchor without leaving the midway.
+              Wallet → Avatar → Anchor in one interface.
             </h2>
             <p className="font-body mt-4 text-base text-white/70 md:text-lg">
               Three steady checkpoints keep the build predictable and easy to retrace.
@@ -54,7 +56,8 @@ interface FlowStepProps extends FlowStepConfig {
   index: number;
 }
 
-function FlowStep({ title, description, icon: Icon, accent, index, href }: FlowStepProps) {
+function FlowStep({ title, description, icon: Icon, badgeIcon, subtitle, accent, index, href }: FlowStepProps) {
+  const BadgeIcon = badgeIcon ?? Icon;
   return (
     <motion.article
       whileHover={{ y: -10, scale: 1.015 }}
@@ -75,6 +78,12 @@ function FlowStep({ title, description, icon: Icon, accent, index, href }: FlowS
           Step {index.toString().padStart(2, "0")}
         </span>
       </div>
+      {subtitle && (
+        <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">
+          <BadgeIcon className="h-3 w-3" aria-hidden />
+          {subtitle}
+        </span>
+      )}
       <h3 className="font-heading mt-8 text-2xl font-semibold text-white">
         {title}
       </h3>

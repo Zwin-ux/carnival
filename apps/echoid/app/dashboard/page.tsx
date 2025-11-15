@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from "react";
 import ProfileForm from "@/components/ProfileForm";
@@ -115,7 +116,7 @@ export default function Dashboard() {
                   <div>
                     <BoothCardTitle>🎟️ Admission Gate</BoothCardTitle>
                     <BoothCardDescription>
-                      Connect your wallet to enter the Identity Carnival!
+                      Connect Polkadot.js to unlock anchoring.
                     </BoothCardDescription>
                   </div>
                 </div>
@@ -125,6 +126,17 @@ export default function Dashboard() {
               </BoothCardContent>
             </BoothCard>
           </motion.div>
+        )}
+
+        {!account && tabValue === "anchor" && (
+          <div className="mt-4 text-center">
+            <Link
+              href="/builder#connect"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#00D1FF] underline-offset-4 hover:underline"
+            >
+              Connect wallet in builder
+            </Link>
+          </div>
         )}
 
         {/* Tabbed Interface */}

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import PolkadotConnect from "@/components/wallet/PolkadotConnect";
 import LayerCanvas from "@/components/avatar/LayerCanvas";
 import { TicketButton } from "@/components/ui/ticket-button";
+import toast from "react-hot-toast";
 import {
   traitsCatalog,
   traitCategoriesInOrder,
@@ -42,6 +43,7 @@ const BuilderPage = () => {
   const selectedTraitDefinitions = useAvatarStore(selectSelectedTraitDefinitions);
   const traitMap = useAvatarStore(selectTraitMap);
   const unlockedGates = useAvatarStore(selectUnlockedGates);
+  const walletToastAddress = useRef<string | null>(null);
 
   const selectedByCategory = traitCategoriesInOrder.reduce<Record<TraitCategory, TraitDefinition | null>>(
     (acc, category) => {
@@ -62,6 +64,19 @@ const BuilderPage = () => {
   useEffect(() => {
     resetPreview();
   }, [resetPreview]);
+
+  useEffect(() => {
+    if (walletAddress && walletToastAddress.current !== walletAddress) {
+      const truncated = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+      toast.success(`Wallet connected: ${truncated}`);
+      walletToastAddress.current = walletAddress;
+      return;
+    }
+
+    if (!walletAddress) {
+      walletToastAddress.current = null;
+    }
+  }, [walletAddress]);
 
   const handleRender = (dataUrl: string) => {
     setPreviewData({ imageDataUrl: dataUrl });
@@ -111,14 +126,24 @@ const BuilderPage = () => {
               </div>
 
               <div className="mt-6 flex flex-wrap gap-3">
-                <TicketButton
-                  variant="primary"
-                  size="md"
-                  onClick={() => randomizeTraits()}
-                  disabled={!isConnected}
-                >
-                  Randomize Genesis
-                </TicketButton>
+                <div className="flex flex-col">
+                  <TicketButton
+                    variant="primary"
+                    size="md"
+                    onClick={() => randomizeTraits()}
+                    disabled={!isConnected}
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
+                    Randomize Genesis
+                  </TicketButton>
+                  <span
+                    className={`mt-1 text-xs ${isConnected ? "text-white/45" : "text-white/70"}`}
+                    aria-live="polite"
+                  >
+                    Requires wallet connection.
+                  </span>
+                </div>
                 <TicketButton variant="secondary" size="md" onClick={handleDownload} disabled={!preview.imageDataUrl}>
                   Download PNG
                 </TicketButton>

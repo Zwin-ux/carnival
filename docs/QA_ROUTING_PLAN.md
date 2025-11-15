@@ -8,11 +8,12 @@
 ## 2. Routing & CTA Matrix
 | Area | Trigger | Expected Target | Notes |
 | --- | --- | --- | --- |
-| Hero primary CTA | `TicketButton` → `/builder` | Loads builder page with wallet panel in view | Uses `Link` inside TicketButton; verify focus ring and keyboard activation. |
-| Hero secondary CTA | Button `Explore the Flow` | Smooth-scroll to `#flow` | Ensure `document.getElementById("flow")` exists and motion prefs respected. |
+| Hero primary CTA | `Start Building` button → `/builder` | Loads builder page with wallet panel in view | Uses `Link` inside TicketButton; verify focus ring and keyboard activation. |
+| Hero secondary CTA | Button label toggles `See Flow` (≥1024px) / `Scroll to Flow` (<1024px) | Smooth-scroll to `#flow` | Ensure `document.getElementById("flow")` exists and aria-label references flow overview. |
 | FlowRail Step 1 | `href="/builder#connect"` | Focus on wallet card | Requires `id="connect"` (added). |
 | FlowRail Step 2 | `href="/builder#avatar"` | Scroll into avatar canvas | Requires `id="avatar"`. |
 | FlowRail Step 3 | `href="/dashboard#anchor"` | Activates dashboard anchor tab | `TabsContent` carries `id="anchor"`; confirm router retains hash.
+| Dashboard anchor fallback | Direct-load `/dashboard#anchor` without wallet | Inline CTA link to `/builder#connect` plus updated copy | Expect text “Connect Polkadot.js to unlock anchoring.” and link label “Connect wallet in builder.” |
 | Header nav | `/`, `/builder`, `/quests`, `#lore`, `/dashboard` | Standard Next.js routing | Add regression test to ensure `#lore` anchor exists in landing page. |
 | Closing CTA | `/dashboard` | Opens Launch Deck/prize counter | `TicketButton` + Link usage. |
 | Builder actions | Buttons within `LayerCanvas`, trait selectors | Local state updates only | Add smoke tests covering randomize, download, trait gating. |
@@ -42,10 +43,11 @@
    - `pnpm --filter @echoid/api test` to execute integration suites.
 2. **Component/unit tests**
    - Target Zustand stores (`src/state/useAvatarStore.ts`) using Jest + `zustand/middleware`. Verify selectors respond to actions above.
-3. **Playwright smoke** (add under `apps/echoid/tests/e2e`):
-   - Scenario 1: load `/`, click each CTA, assert `url()` matches matrix.
-   - Scenario 2: simulate wallet stub (mock `window.injectedWeb3`) to test builder interactions.
-   - Scenario 3: navigate directly to `/dashboard#anchor`, confirm anchor tab visible.
+3. **Playwright smoke** (`apps/echoid/e2e`):
+   - Scenario 1: landing CTA mapping (`routing-smoke.spec.ts`).
+   - Scenario 2: mocked `window.injectedWeb3` flow exercises builder ticket booth and persists wallet selection to `localStorage` before visiting `/quests`.
+   - Scenario 3: direct-hash routes for `/dashboard#anchor` plus `/profile/[address]` use API fixtures to ensure UI hydration without depending on seeded data.
+   - Command: `pnpm --filter echoid test:e2e` (starts Next dev server automatically via Playwright `webServer`).
 4. **Accessibility**
    - Add `pnpm exec axe http://localhost:3000` or integrate `@axe-core/playwright` to fail builds on WCAG violations for routed pages.
 5. **Monitoring hooks**
@@ -57,12 +59,9 @@
    ```powershell
    pnpm lint
    pnpm --filter @echoid/api test
+   pnpm --filter echoid test:e2e
    ```
-3. For UI changes, run Playwright smoke suite locally: 
-   ```powershell
-   cd apps/echoid
-   pnpm exec playwright test --config=playwright.config.ts --project=chromium
-   ```
+3. For UI changes, ensure the E2E smoke above passes (runs from repo root; no additional commands needed).
 4. Attach Lighthouse summary for affected routes (desktop + mobile) to pull request.
 5. Record manual spot-check results in PR description (who ran it, what path, timestamp).
 
