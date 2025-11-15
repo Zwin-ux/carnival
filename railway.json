@@ -4,16 +4,15 @@
     "name": "echoid-carnival"
   },
   "defaultEnvironment": "production",
-  "environments": [
-    {
-      "name": "production",
+  "environments": {
+    "production": {
       "services": [
         "postgres",
         "api",
         "web"
       ]
     }
-  ],
+  },
   "plugins": {
     "postgres": {
       "name": "postgres",
