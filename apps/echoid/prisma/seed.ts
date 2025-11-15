@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../src/server/generated/echoid-client";
 const prisma = new PrismaClient();
 
 async function main() {

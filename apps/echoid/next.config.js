@@ -1,3 +1,6 @@
+const path = require('path');
+const repoRoot = path.join(__dirname, '../..');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Optimize production builds
@@ -18,8 +21,7 @@ const nextConfig = {
 
   // Turbopack configuration (Next.js 16+)
   turbopack: {
-    // Empty config to acknowledge Turbopack usage
-    // Turbopack handles optimizations automatically
+    root: repoRoot,
   },
 
   // Headers for security and performance

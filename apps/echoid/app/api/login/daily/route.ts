@@ -77,7 +77,10 @@ export async function POST(request: NextRequest) {
     // Check for streak achievements
     const newAchievements: any[] = [];
 
-    if (newStreak === 7 && !profile.achievements.find(a => a.badgeType === 'on_fire')) {
+    if (
+      newStreak === 7 &&
+      !profile.achievements.find((achievement: { badgeType?: string }) => achievement.badgeType === "on_fire")
+    ) {
       const achievement = await prisma.achievement.create({
         data: {
           profileId: profile.id,

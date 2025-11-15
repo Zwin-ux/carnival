@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require('../src/server/generated/echoid-client');
 const prisma = new PrismaClient();
 
 async function main() {
