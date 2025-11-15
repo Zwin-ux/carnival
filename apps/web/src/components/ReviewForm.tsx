@@ -4,7 +4,8 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
-import { GlassPanel, HoloBadge, NeoButton } from "@echoid/ui";
+import { HoloBadge, NeoButton } from "@echoid/ui";
+import { GlassPanel } from "@/components/ui/GlassPanel";
 import { canonicalJson } from "@echoid/core";
 import { celebrateSuccess } from "@/utils/confetti";
 import { useWallet } from "@/providers/WalletProvider";
@@ -95,10 +96,10 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
         animate={{ opacity: 1, scale: 1 }}
         transition={reduceMotion ? undefined : { duration: 0.5, ease: "easeOut" }}
       >
-        <GlassPanel depth="md" padding="lg" accent="plasma" className="space-y-3 text-center">
+        <GlassPanel tone="neon" padding="lg" className="space-y-3 text-center">
           <div className="text-4xl">*</div>
-          <p className="text-2xl font-heading text-ice-100">Review anchored</p>
-          <p className="text-sm text-ice-300/75">Thanks for keeping the graph glowing.</p>
+          <p className="text-2xl font-heading text-chrome-100">Review anchored</p>
+          <p className="text-sm text-steel-200/75">Thanks for keeping the graph glowing.</p>
         </GlassPanel>
       </motion.div>
     );
@@ -110,11 +111,11 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
       animate={{ opacity: 1, y: 0 }}
       transition={reduceMotion ? undefined : { duration: 0.5 }}
     >
-      <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-5">
+      <GlassPanel tone="steel" padding="lg" className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Signed kudos</p>
-            <h3 className="font-heading text-2xl text-ice-100">Leave a review</h3>
+            <h3 className="font-heading text-2xl text-chrome-100">Leave a review</h3>
           </div>
           <HoloBadge tone="plasma" label="Attested" />
         </div>
@@ -126,7 +127,7 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
         )}
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-ice-200">Rating</label>
+          <label className="text-sm font-medium text-chrome-200">Rating</label>
           <div className="flex flex-wrap gap-3">
             {[1, 2, 3, 4, 5].map((star) => {
               const isActive = star <= rating;
@@ -137,10 +138,10 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
                   whileHover={reduceMotion ? undefined : { scale: 1.05 }}
                   whileTap={reduceMotion ? undefined : { scale: 0.96 }}
                   onClick={() => setRating(star)}
-                  className={`w-28 rounded-2xl border px-3 py-2 text-center ${isActive ? "border-plasma-400/60 bg-plasma-400/10 text-plasma-200" : "border-graphite-700/70 bg-graphite-900/50 text-ice-300/70"}`}
+                  className={`w-28 rounded-2xl border px-3 py-2 text-center ${isActive ? "border-plasma-400/60 bg-plasma-400/10 text-plasma-200" : "border-steel-700/60 bg-chrome-950/50 text-steel-200/70"}`}
                 >
                   <Star className="mx-auto h-6 w-6" fill="currentColor" />
-                  <span className="mt-1 block text-xs text-ice-300/70">{ratingLabels[star - 1]}</span>
+                  <span className="mt-1 block text-xs text-steel-200/70">{ratingLabels[star - 1]}</span>
                 </motion.button>
               );
             })}
@@ -148,16 +149,16 @@ export function ReviewForm({ sessionId, onSuccess, successRedirect }: ReviewForm
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-ice-200">Comment</label>
+          <label className="text-sm font-medium text-chrome-200">Comment</label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             maxLength={1000}
             rows={4}
-            className="w-full rounded-2xl border border-graphite-700/70 bg-graphite-950/70 px-4 py-3 text-sm text-ice-100 placeholder:text-ice-300/30"
+            className="w-full rounded-2xl border border-steel-700/60 bg-chrome-950/70 px-4 py-3 text-sm text-chrome-100 placeholder:text-steel-200/30"
             placeholder="What stood out about this expert?"
           />
-          <p className="text-right text-xs text-ice-300/60">{comment.length}/1000</p>
+          <p className="text-right text-xs text-steel-200/60">{comment.length}/1000</p>
         </div>
 
         <NeoButton onClick={submitReview} disabled={isSubmitting || !selectedAccount} loading={isSubmitting} fullWidth>

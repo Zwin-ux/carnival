@@ -3,8 +3,9 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { ArrowRight, Sparkles } from "lucide-react";
 import * as DB from "@echoid/db";
-import { GlassPanel, HoloBadge, NeoButton } from "@echoid/ui";
+import { HoloBadge, NeoButton } from "@echoid/ui";
 import { requireServerAuth } from "@/lib/server-auth";
+import { GlassPanel } from "@/components/ui/GlassPanel";
 
 export default async function DashboardPage() {
   const auth = await requireServerAuth();
@@ -76,20 +77,20 @@ export default async function DashboardPage() {
   ];
 
   const listShell =
-    "rounded-2xl border border-graphite-700/60 bg-graphite-900/50 p-4 text-ice-200 transition hover:border-plasma-400/40";
+    "rounded-2xl border border-steel-700/50 bg-chrome-950/40 p-4 text-chrome-100 transition hover:border-brass-400/40 hover:bg-chrome-900/40";
 
   return (
     <main className="flex-1 px-4 py-12">
       <div className="mx-auto max-w-6xl space-y-8">
-        <GlassPanel depth="lg" padding="lg" accent="graphite" className="space-y-6">
+        <GlassPanel tone="steel" padding="lg" className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="space-y-3">
               <HoloBadge tone="plasma" label="Command Deck" meta="Live telemetry" />
               <div>
                 <p className="text-xs font-data uppercase tracking-[0.35em] text-mist-400">Welcome back</p>
-                <h1 className="font-heading text-4xl text-ice-100">Dashboard</h1>
+                <h1 className="font-heading text-4xl text-chrome-100">Dashboard</h1>
               </div>
-              <p className="max-w-3xl text-sm text-ice-300/80">
+              <p className="max-w-3xl text-sm text-steel-200/80">
                 Track booth performance, wrap every session with signed reviews, and keep the plasma trust loop glowing.
               </p>
             </div>
@@ -114,20 +115,20 @@ export default async function DashboardPage() {
 
         <section className="grid gap-4 md:grid-cols-3">
           {statCards.map((card) => (
-            <GlassPanel key={card.label} depth="sm" padding="md" accent="graphite" className="space-y-2">
+            <GlassPanel key={card.label} tone="steel" padding="md" className="space-y-2">
               <p className="text-xs font-data uppercase tracking-[0.35em] text-mist-400">{card.label}</p>
-              <p className="font-heading text-3xl text-ice-100">{card.value}</p>
-              <p className="text-xs text-ice-300/70">{card.meta}</p>
+              <p className="font-heading text-3xl text-chrome-100">{card.value}</p>
+              <p className="text-xs text-steel-200/70">{card.meta}</p>
             </GlassPanel>
           ))}
         </section>
 
         {pendingReviews.length > 0 && (
-          <GlassPanel depth="md" padding="lg" accent="nova" className="space-y-4">
+          <GlassPanel tone="neon" padding="lg" className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-data uppercase tracking-[0.35em] text-mist-400">Pending reviews</p>
-                <h2 className="font-heading text-2xl text-ice-100">Sign and anchor</h2>
+                <h2 className="font-heading text-2xl text-chrome-100">Sign and anchor</h2>
               </div>
               <span className="rounded-full border border-nova-400/40 px-4 py-1 text-xs font-data uppercase tracking-[0.3em] text-nova-200">
                 {pendingReviews.length} waiting
@@ -138,7 +139,7 @@ export default async function DashboardPage() {
                 <div key={session.id} className={listShell}>
                   <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
                     <div>
-                      <p className="font-semibold text-ice-100">{session.booth.title}</p>
+                      <p className="font-semibold text-chrome-100">{session.booth.title}</p>
                       <p className="text-xs text-mist-400">
                         Hosted by {session.expert?.displayName || "Anonymous"} - {dayjs(session.endedAt ?? session.createdAt).fromNow()}
                       </p>
@@ -157,20 +158,20 @@ export default async function DashboardPage() {
         )}
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-4">
+          <GlassPanel tone="steel" padding="lg" className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-heading text-2xl text-ice-100">My Booths</h2>
+              <h2 className="font-heading text-2xl text-chrome-100">My Booths</h2>
               <HoloBadge tone="plasma" label="Live" meta={`${booths.length} total`} />
             </div>
             {booths.length === 0 ? (
-              <p className="text-sm text-ice-300/70">You haven&apos;t created any booths yet.</p>
+              <p className="text-sm text-steel-200/70">You haven&apos;t created any booths yet.</p>
             ) : (
               <ul className="space-y-3">
                 {booths.map((booth) => (
                   <li key={booth.id} className={listShell}>
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-ice-100">{booth.title}</p>
+                        <p className="font-semibold text-chrome-100">{booth.title}</p>
                         <p className="text-xs text-mist-400">Updated {dayjs(booth.updatedAt).fromNow()}</p>
                       </div>
                       <span className="text-xs text-mist-300">{booth._count.sessions} sessions</span>
@@ -181,20 +182,20 @@ export default async function DashboardPage() {
             )}
           </GlassPanel>
 
-          <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-4">
+          <GlassPanel tone="steel" padding="lg" className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="font-heading text-2xl text-ice-100">Upcoming Sessions</h2>
+              <h2 className="font-heading text-2xl text-chrome-100">Upcoming Sessions</h2>
               <HoloBadge tone="plasma" label="Queue" meta={`${upcomingSessions.length}`} />
             </div>
             {upcomingSessions.length === 0 ? (
-              <p className="text-sm text-ice-300/70">No upcoming sessions.</p>
+              <p className="text-sm text-steel-200/70">No upcoming sessions.</p>
             ) : (
               <ul className="space-y-3">
                 {upcomingSessions.map((session) => (
                   <li key={session.id} className={listShell}>
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-ice-100">{session.booth.title}</p>
+                        <p className="font-semibold text-chrome-100">{session.booth.title}</p>
                         <p className="text-xs text-mist-400">{session.client?.displayName || "Anonymous"}</p>
                       </div>
                       <span className="rounded-full border border-plasma-400/40 px-3 py-1 text-xs text-plasma-200">
@@ -210,17 +211,17 @@ export default async function DashboardPage() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-4">
-            <h2 className="font-heading text-2xl text-ice-100">Booking History</h2>
+          <GlassPanel tone="steel" padding="lg" className="space-y-4">
+            <h2 className="font-heading text-2xl text-chrome-100">Booking History</h2>
             {pastSessionsAsClient.length === 0 ? (
-              <p className="text-sm text-ice-300/70">You haven&apos;t completed any sessions as a client yet.</p>
+              <p className="text-sm text-steel-200/70">You haven&apos;t completed any sessions as a client yet.</p>
             ) : (
               <ul className="space-y-3">
                 {pastSessionsAsClient.map((session) => (
                   <li key={session.id} className={listShell}>
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-ice-100">{session.booth.title}</p>
+                        <p className="font-semibold text-chrome-100">{session.booth.title}</p>
                         <p className="text-xs text-mist-400">
                           Hosted by {session.expert?.displayName || "Anonymous"} - {dayjs(session.endedAt ?? session.createdAt).fromNow()}
                         </p>
@@ -243,17 +244,17 @@ export default async function DashboardPage() {
             )}
           </GlassPanel>
 
-          <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-4">
-            <h2 className="font-heading text-2xl text-ice-100">Host History</h2>
+          <GlassPanel tone="steel" padding="lg" className="space-y-4">
+            <h2 className="font-heading text-2xl text-chrome-100">Host History</h2>
             {pastSessionsAsExpert.length === 0 ? (
-              <p className="text-sm text-ice-300/70">You haven&apos;t completed any sessions as an expert yet.</p>
+              <p className="text-sm text-steel-200/70">You haven&apos;t completed any sessions as an expert yet.</p>
             ) : (
               <ul className="space-y-3">
                 {pastSessionsAsExpert.map((session) => (
                   <li key={session.id} className={listShell}>
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-ice-100">{session.booth.title}</p>
+                        <p className="font-semibold text-chrome-100">{session.booth.title}</p>
                         <p className="text-xs text-mist-400">
                           {session.client?.displayName || "Anonymous"} - {dayjs(session.endedAt ?? session.createdAt).fromNow()}
                         </p>
@@ -269,20 +270,20 @@ export default async function DashboardPage() {
           </GlassPanel>
         </section>
 
-        <GlassPanel depth="md" padding="lg" accent="graphite" className="space-y-4">
+        <GlassPanel tone="steel" padding="lg" className="space-y-4">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-heading text-2xl text-ice-100">Latest Feedback</h2>
+            <h2 className="font-heading text-2xl text-chrome-100">Latest Feedback</h2>
             <HoloBadge tone="plasma" label="Reviews" meta={`${reviews.length}`} />
           </div>
           {reviews.length === 0 ? (
-            <p className="text-sm text-ice-300/70">No reviews yet.</p>
+            <p className="text-sm text-steel-200/70">No reviews yet.</p>
           ) : (
             <ul className="space-y-3">
               {reviews.map((review) => (
                 <li key={review.id} className={listShell}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-ice-100">{review.session.booth.title}</p>
+                      <p className="font-semibold text-chrome-100">{review.session.booth.title}</p>
                       <p className="text-xs text-mist-400">{review.fromUser.displayName || review.fromUser.walletAddress}</p>
                       <p className="text-xs text-mist-400">Reviewed {dayjs(review.createdAt).fromNow()}</p>
                     </div>
@@ -290,7 +291,7 @@ export default async function DashboardPage() {
                       {review.rating} / 5
                     </span>
                   </div>
-                  {review.comment && <p className="mt-2 text-sm text-ice-300/80">{review.comment}</p>}
+                  {review.comment && <p className="mt-2 text-sm text-steel-200/80">{review.comment}</p>}
                 </li>
               ))}
             </ul>

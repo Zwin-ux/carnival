@@ -21,7 +21,7 @@ export default function RootLayout({
       lang="en"
       className={`${bodySans.variable} ${bodyMono.variable} ${headingDisplay.variable} ${dataGrotesk.variable}`}
     >
-      <body className="holo-body font-sans text-ice-100 antialiased">
+      <body className="holo-body font-sans text-chrome-100 antialiased">
         <WalletProvider>
           <div className="min-h-screen flex flex-col">
             <Header />

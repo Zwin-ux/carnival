@@ -1,21 +1,21 @@
 import { Router } from "express";
+import { z } from "zod";
 import * as DB from "@echoid/db";
-import * as Core from "@echoid/core";
 import { requireAuth } from "../middleware/auth";
+import { calculateTrustScore } from "../lib/reputation";
+import { canonicalJson, hashPayload, verifySignature } from "../lib/crypto";
+import { createReviewMerkleTree, getMerkleRoot, anchorMerkleRoot } from "../lib/merkle";
+import { createSessionCompletionAttestation } from "../lib/attestations";
 
 const { prisma, AttestationType: PrismaAttestationType } = DB;
 
-const {
-  ReviewCreateSchema,
-  calculateTrustScore,
-  hashPayload,
-  verifySignature,
-  canonicalJson,
-  createSessionCompletionAttestation,
-  createReviewMerkleTree,
-  getMerkleRoot,
-  anchorMerkleRoot,
-} = Core;
+const ReviewCreateSchema = z.object({
+  sessionId: z.string().cuid("Invalid session ID"),
+  rating: z.number().int().min(1).max(5, "Rating must be between 1 and 5"),
+  comment: z.string().max(1000).optional(),
+  timestamp: z.number().int().positive("Timestamp required"),
+  signature: z.string().min(1, "Signature required"),
+});
 
 export const reviewRouter = Router();
 
@@ -62,7 +62,7 @@ reviewRouter.post("/", requireAuth, async (req, res, next) => {
     // Build canonical payload
     const payload = {
       sessionId: data.sessionId,
-      walletAddress: req.auth!.walletAddress,
+      address: req.auth!.walletAddress,
       rating: data.rating,
       comment: data.comment ?? "",
       timestamp: data.timestamp,
@@ -128,7 +128,7 @@ reviewRouter.post("/", requireAuth, async (req, res, next) => {
       await prisma.attestation.create({
         data: {
           attestationId: attestation.attestationId,
-        type: PrismaAttestationType.SESSION_COMPLETION,
+          type: PrismaAttestationType.SESSION_COMPLETION,
           subjectAddress: session.client.walletAddress,
           claimData: JSON.stringify(attestation.attestationData.claim),
           issuerAddress: session.expert.walletAddress,
@@ -211,8 +211,8 @@ reviewRouter.get("/:sessionId", async (req, res, next) => {
     const review = await prisma.review.findUnique({
       where: { sessionId: req.params.sessionId },
       include: {
-        fromUser: { select: { id: true, displayName: true } },
-        toUser: { select: { id: true, displayName: true } },
+        fromUser: { select: { id: true, handle: true } },
+        toUser: { select: { id: true, handle: true } },
         session: {
           include: {
             booth: { select: { title: true, slug: true } },

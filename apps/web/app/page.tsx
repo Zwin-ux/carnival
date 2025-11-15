@@ -1,7 +1,9 @@
 import { prisma } from "@echoid/db";
-import { BoothCard, GlassPanel, HoloBadge } from "@echoid/ui";
+import { BoothCard, HoloBadge } from "@echoid/ui";
 import { MidwayHero } from "@/components/MidwayHero";
 import { FortuneWheel } from "@/components/FortuneWheel";
+import { GlassPanel } from "@/components/ui/GlassPanel";
+import { OnboardingShowcase } from "@/components/OnboardingShowcase";
 
 const THEME_TAGS = [
   {
@@ -22,12 +24,11 @@ export const dynamic = "force-dynamic";
 
 async function getFeaturedBooths() {
   return prisma.booth.findMany({
-    where: { active: true },
     include: {
-      owner: { select: { displayName: true } },
+      owner: { select: { handle: true, displayName: true } },
       _count: { select: { sessions: true } },
     },
-    orderBy: { trustScore: "desc" },
+    orderBy: { createdAt: "desc" },
     take: 12,
   });
 }
@@ -58,15 +59,16 @@ export default async function HomePage() {
   return (
     <main className="flex-1 space-y-16">
       <MidwayHero primaryCtaHref="/booths" secondaryCtaHref="/dashboard" />
+      <OnboardingShowcase />
 
       <section className="holo-section px-4">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row">
           <div className="flex-1">
-            <GlassPanel depth="lg" padding="lg" accent="graphite" className="h-full">
+            <GlassPanel tone="steel" padding="lg" className="h-full">
               <FortuneWheel booths={featuredBooths} initialStats={wheelStats} tagFilters={tagFilters} />
             </GlassPanel>
           </div>
-          <GlassPanel depth="sm" padding="lg" accent="plasma" className="lg:w-80">
+          <GlassPanel tone="brass" padding="lg" className="lg:w-80">
             <div className="space-y-3 text-left">
               <HoloBadge tone="plasma" label="Live Metrics" meta="Updated in real-time" />
               <p className="text-lg font-heading text-ice-100">Fortune Wheel v2</p>

@@ -4,8 +4,6 @@ import { prisma } from "./client";
 
 const DEFAULT_TTL_SECONDS = parseInt(process.env.AUTH_CHALLENGE_TTL ?? "300", 10);
 
-const db = prisma as any;
-
 function buildExpiry(ttlSeconds: number): Date {
   const ttl = Number.isFinite(ttlSeconds) && ttlSeconds > 0 ? ttlSeconds : 300;
   return new Date(Date.now() + ttl * 1000);
@@ -21,7 +19,7 @@ export async function createAuthChallenge(walletAddress: string): Promise<{
   const message = `EchoID Carnival Sign-In\nWallet: ${walletAddress}\nNonce: ${nonce}\nExpires: ${expiresAt.toISOString()}`;
 
   // Cleanup stale challenges for this wallet
-  await db.authChallenge.deleteMany({
+  await prisma.authChallenge.deleteMany({
     where: {
       walletAddress,
       expiresAt: {
@@ -30,7 +28,7 @@ export async function createAuthChallenge(walletAddress: string): Promise<{
     },
   });
 
-  await db.authChallenge.create({
+  await prisma.authChallenge.create({
     data: {
       walletAddress,
       nonce,
@@ -45,7 +43,7 @@ export async function createAuthChallenge(walletAddress: string): Promise<{
 export async function consumeAuthChallenge(walletAddress: string, nonce: string): Promise<{
   message: string;
 }> {
-  const record = await db.authChallenge.findUnique({
+  const record = await prisma.authChallenge.findUnique({
     where: { nonce },
   });
 
@@ -54,11 +52,11 @@ export async function consumeAuthChallenge(walletAddress: string, nonce: string)
   }
 
   if (record.expiresAt.getTime() < Date.now()) {
-    await db.authChallenge.delete({ where: { nonce } });
+    await prisma.authChallenge.delete({ where: { nonce } });
     throw new Error("Challenge expired");
   }
 
-  await db.authChallenge.delete({ where: { nonce } });
+  await prisma.authChallenge.delete({ where: { nonce } });
   return { message: record.message };
 }
 
@@ -76,6 +74,7 @@ export async function ensureUserForWallet(walletAddress: string): Promise<User> 
   user = await prisma.user.create({
     data: {
       walletAddress,
+      handle: shortAddress,
       displayName: shortAddress,
     },
   });

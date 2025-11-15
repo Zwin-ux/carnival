@@ -1,11 +1,33 @@
 import { Router } from "express";
 import * as DB from "@echoid/db";
-import * as CoreSchemas from "@echoid/core";
+import { z } from "zod";
 import { requireAuth } from "../middleware/auth";
 
 const { prisma } = DB;
 
-const { BoothCreateSchema, BoothUpdateSchema, BoothFilterSchema } = CoreSchemas;
+const BoothCreateSchema = z.object({
+  title: z.string().min(3).max(100),
+  slug: z
+    .string()
+    .min(3)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/),
+  description: z.string().min(10).max(1000),
+  pricePerMin: z.number().int().positive(),
+  tags: z.array(z.string()).min(1).max(10),
+});
+
+const BoothUpdateSchema = BoothCreateSchema.partial().extend({
+  active: z.boolean().optional(),
+});
+
+const BoothFilterSchema = z.object({
+  tags: z.array(z.string()).optional(),
+  minPrice: z.number().int().nonnegative().optional(),
+  maxPrice: z.number().int().positive().optional(),
+  active: z.boolean().optional(),
+  ownerId: z.string().optional(),
+});
 
 export const boothRouter = Router();
 
@@ -34,8 +56,8 @@ boothRouter.get("/", async (req, res, next) => {
         owner: {
           select: {
             id: true,
-            displayName: true,
-            avatarUrl: true,
+            handle: true,
+            avatar: true,
             walletAddress: true,
           },
         },
@@ -65,9 +87,9 @@ boothRouter.get("/:slug", async (req, res, next) => {
         owner: {
           select: {
             id: true,
-            displayName: true,
+            handle: true,
             bio: true,
-            avatarUrl: true,
+            avatar: true,
             walletAddress: true,
           },
         },
@@ -104,7 +126,7 @@ boothRouter.post("/", requireAuth, async (req, res, next) => {
         owner: {
           select: {
             id: true,
-            displayName: true,
+            handle: true,
             walletAddress: true,
           },
         },
@@ -132,7 +154,7 @@ boothRouter.patch("/:id", requireAuth, async (req, res, next) => {
         owner: {
           select: {
             id: true,
-            displayName: true,
+            handle: true,
             walletAddress: true,
           },
         },

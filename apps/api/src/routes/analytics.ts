@@ -1,7 +1,14 @@
 import { Router } from "express";
 import { z } from "zod";
 import * as DB from "@echoid/db";
-import { WheelAnalyticsEventSchema } from "@echoid/core";
+
+// Define wheel analytics schema inline instead of importing from @echoid/core to avoid
+// runtime ESM export resolution issues with tsx. Keep this schema in sync with
+// `packages/core/src/schemas.ts`.
+const WheelAnalyticsEventSchema = z.object({
+  filter: z.string().min(1),
+  event: z.enum(["spin", "visit"]),
+});
 
 const { prisma } = DB;
 

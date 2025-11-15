@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Activity, ShieldCheck, Sparkles, Zap } from "lucide-react";
-import { GlassPanel, HoloBadge, NeoButton } from "@echoid/ui";
+import { HoloBadge, NeoButton } from "@echoid/ui";
+import { GlassPanel } from "@/components/ui/GlassPanel";
 
 interface MidwayHeroProps {
   primaryCtaHref: string;
@@ -91,12 +92,7 @@ function HeroOrb({ reduceMotion }: { reduceMotion: boolean }) {
         <div className="absolute inset-0 rounded-full border border-nova-400/30 animate-pulse-glow" />
       </motion.div>
 
-      <GlassPanel
-        depth="sm"
-        padding="sm"
-        className="absolute -bottom-6 left-1/2 w-64 -translate-x-1/2 text-left"
-        accent="plasma"
-      >
+      <GlassPanel tone="neon" padding="sm" className="absolute -bottom-6 left-1/2 w-64 -translate-x-1/2 text-left">
         <p className="text-[0.65rem] font-data uppercase tracking-[0.4em] text-mist-400">Fortune Wheel</p>
         <p className="text-3xl font-heading text-ice-100">
           92% <span className="text-base text-ice-300/70">match rate</span>
@@ -108,7 +104,7 @@ function HeroOrb({ reduceMotion }: { reduceMotion: boolean }) {
 }
 
 export function MidwayHero({ primaryCtaHref, secondaryCtaHref }: MidwayHeroProps) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotion() ?? false;
 
   return (
     <section className="relative overflow-hidden px-4 py-24 hero-grid">
@@ -167,7 +163,7 @@ export function MidwayHero({ primaryCtaHref, secondaryCtaHref }: MidwayHeroProps
 
           <div className="grid gap-4 sm:grid-cols-2">
             {FEATURE_MODULES.map(({ title, copy, icon: Icon }) => (
-              <GlassPanel key={title} depth="sm" padding="sm" accent="graphite" className="text-left">
+              <GlassPanel key={title} tone="steel" padding="sm" className="text-left">
                 <div className="flex items-center gap-3">
                   <Icon className="h-5 w-5 text-plasma-400" />
                   <p className="font-heading text-sm text-ice-100">{title}</p>
@@ -179,7 +175,7 @@ export function MidwayHero({ primaryCtaHref, secondaryCtaHref }: MidwayHeroProps
 
           <div className="grid gap-4 md:grid-cols-2">
             {HERO_STATS.map((stat) => (
-              <GlassPanel key={stat.label} depth="sm" padding="sm" accent="plasma" interactive className="text-left">
+              <GlassPanel key={stat.label} tone="neon" padding="sm" interactive className="text-left">
                 <p className="text-[0.65rem] font-data uppercase tracking-[0.4em] text-mist-400">{stat.label}</p>
                 <p className="text-3xl font-heading text-ice-100">{stat.value}</p>
                 <p className="text-xs text-ice-300/70">{stat.meta}</p>

@@ -1,4 +1,12 @@
 import type { Config } from "tailwindcss";
+import { carnivalTheme } from "./src/theme/colors";
+
+const metalPalette = {
+  chrome: carnivalTheme.chrome,
+  brass: carnivalTheme.brass,
+  steel: carnivalTheme.steel,
+  neon: carnivalTheme.neon,
+};
 
 const config: Config = {
   content: [
@@ -9,6 +17,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        ...metalPalette,
         graphite: {
           1000: "#010205",
           950: "#05060a",
@@ -68,13 +77,6 @@ const config: Config = {
           800: "#171a2d",
           700: "#232742",
         },
-        brass: {
-          700: "#7a4410",
-          600: "#a4591b",
-          500: "#d3943f",
-          400: "#f4c674",
-          300: "#ffe2a8",
-        },
         ember: {
           500: "#ff5c31",
           400: "#ff7a45",
@@ -109,11 +111,6 @@ const config: Config = {
           600: "#8d3d2e",
           500: "#b04b3a",
           400: "#da6b53",
-        },
-        steel: {
-          500: "#3f4a61",
-          400: "#56607a",
-          300: "#7a82a0",
         },
       },
       fontFamily: {

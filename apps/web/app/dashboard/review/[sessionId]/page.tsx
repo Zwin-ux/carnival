@@ -2,7 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@echoid/db";
 import { ReviewForm } from "@/components/ReviewForm";
 import { requireServerAuth } from "@/lib/server-auth";
-import { GlassPanel, HoloBadge } from "@echoid/ui";
+import { HoloBadge } from "@echoid/ui";
+import { GlassPanel } from "@/components/ui/GlassPanel";
 
 interface ReviewSessionPageProps {
   params: Promise<{ sessionId: string }>;
@@ -62,20 +63,20 @@ export default async function ReviewSessionPage({ params }: ReviewSessionPagePro
   return (
     <main className="flex-1 px-4 py-12">
       <div className="mx-auto max-w-3xl space-y-8">
-        <GlassPanel depth="lg" padding="lg" accent="graphite" className="space-y-4">
+        <GlassPanel tone="steel" padding="lg" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-data uppercase tracking-[0.35em] text-mist-400">Session ready for review</p>
-              <h1 className="font-heading text-3xl text-ice-100">{session.booth.title}</h1>
+              <h1 className="font-heading text-3xl text-chrome-100">{session.booth.title}</h1>
             </div>
             <HoloBadge tone="plasma" label="Review" meta="Pending" />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
             {detailItems.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-graphite-700/60 bg-graphite-900/50 p-4">
-                <p className="text-xs font-data uppercase tracking-[0.3em] text-mist-400">{item.label}</p>
-                <p className="mt-1 text-sm text-ice-100">{item.value}</p>
+              <div key={item.label} className="rounded-2xl border border-steel-700/60 bg-chrome-950/50 p-4">
+                <p className="text-xs font-data uppercase tracking-[0.3em] text-steel-200/80">{item.label}</p>
+                <p className="mt-1 text-sm text-chrome-100">{item.value}</p>
               </div>
             ))}
           </div>

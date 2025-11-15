@@ -1,13 +1,18 @@
 import { Router } from "express";
-import * as Core from "@echoid/core";
+import { z } from "zod";
 import * as DB from "@echoid/db";
 import { ensureJwtSecret, requireAuth, signAuthToken } from "../middleware/auth";
+import { verifySignature } from "../lib/crypto";
 
-const {
-  WalletChallengeRequestSchema,
-  WalletVerifyRequestSchema,
-  verifySignature,
-} = Core;
+const WalletChallengeRequestSchema = z.object({
+  walletAddress: z.string().min(1, "Wallet address required"),
+});
+
+const WalletVerifyRequestSchema = z.object({
+  walletAddress: z.string().min(1, "Wallet address required"),
+  nonce: z.string().min(1, "Nonce required"),
+  signature: z.string().min(1, "Signature required"),
+});
 
 const { createAuthChallenge, consumeAuthChallenge, ensureUserForWallet } = DB;
 
@@ -54,7 +59,7 @@ authRouter.post("/verify", async (req, res, next) => {
       user: {
         id: user.id,
         walletAddress: user.walletAddress,
-        displayName: user.displayName,
+        handle: user.handle,
       },
       expiresIn: process.env.AUTH_JWT_EXPIRY ?? "12h",
     });
@@ -71,7 +76,7 @@ authRouter.get("/me", requireAuth, async (req, res, next) => {
       user: {
         id: user.id,
         walletAddress: user.walletAddress,
-        displayName: user.displayName,
+        handle: user.handle,
       },
     });
   } catch (error) {

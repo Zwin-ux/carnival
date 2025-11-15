@@ -33,7 +33,7 @@
       "name": "api",
       "source": {
         "type": "repository",
-        "repository": "https://github.com/Zwin-ux/carnival.git",
+        "repository": "https://github.com/Zwin-ux/EchoID.git",
         "branch": "main",
         "directory": "apps/api"
       },
@@ -54,7 +54,7 @@
       "name": "web",
       "source": {
         "type": "repository",
-        "repository": "https://github.com/Zwin-ux/carnival.git",
+        "repository": "https://github.com/Zwin-ux/EchoID.git",
         "branch": "main",
         "directory": "apps/web"
       },

@@ -1,16 +1,27 @@
 import { Router } from "express";
+import { z } from "zod";
 import * as DB from "@echoid/db";
-import * as Core from "@echoid/core";
 import { requireAuth } from "../middleware/auth";
 
 const { prisma } = DB;
 
-const {
-  SessionStartSchema,
-  SessionActivateSchema,
-  SessionEndSchema,
-  SessionHeartbeatSchema,
-} = Core;
+const SessionStartSchema = z.object({
+  boothId: z.string().cuid("Invalid booth ID"),
+  durationSec: z.number().int().positive().default(300),
+});
+
+const SessionActivateSchema = z.object({
+  sessionId: z.string().cuid("Invalid session ID"),
+});
+
+const SessionEndSchema = z.object({
+  sessionId: z.string().cuid("Invalid session ID"),
+});
+
+const SessionHeartbeatSchema = z.object({
+  sessionId: z.string().cuid("Invalid session ID"),
+  clientTimestamp: z.number().int().positive(),
+});
 
 export const sessionRouter = Router();
 
@@ -74,8 +85,8 @@ sessionRouter.post("/activate", requireAuth, async (req, res, next) => {
       },
       include: {
         booth: true,
-        client: { select: { id: true, displayName: true } },
-        expert: { select: { id: true, displayName: true } },
+        client: { select: { id: true, handle: true } },
+        expert: { select: { id: true, handle: true } },
       },
     });
 
@@ -146,8 +157,8 @@ sessionRouter.post("/end", requireAuth, async (req, res, next) => {
       },
       include: {
         booth: true,
-        client: { select: { id: true, displayName: true } },
-        expert: { select: { id: true, displayName: true } },
+        client: { select: { id: true, handle: true } },
+        expert: { select: { id: true, handle: true } },
       },
     });
 

@@ -3,8 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { toast } from "sonner";
-import { GlassPanel, NeoButton, TimerDisplay } from "@echoid/ui";
+import { TimerDisplay } from "@echoid/ui";
 import { useWallet } from "@/providers/WalletProvider";
+import { GlassPanel } from "@/components/ui/GlassPanel";
+import { celebrateFirework } from "@/utils/confetti";
+import { ServoLever } from "@/components/ui/ServoLever";
 
 interface SessionControlsProps {
   boothId: string;
@@ -13,7 +16,7 @@ interface SessionControlsProps {
 }
 
 export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: SessionControlsProps) {
-  const { selectedAccount, ensureAuthenticated } = useWallet();
+  const { selectedAccount, ensureAuthenticated, connect } = useWallet();
   const routerApi = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   const reduceMotion = useReducedMotion();
 
@@ -75,8 +78,9 @@ export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: S
       }
 
       setIsActive(true);
+      celebrateFirework(0.55, 0.6);
       toast.success("Session started", {
-        description: "Timer is rolling. Jam through your questions then leave a review!",
+        description: "The servo timer is rolling. Jam through your questions then leave a review!",
       });
 
       heartbeatIntervalRef.current = setInterval(async () => {
@@ -133,8 +137,11 @@ export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: S
 
   if (!selectedAccount) {
     return (
-      <GlassPanel depth="sm" padding="md" accent="graphite" className="text-center text-sm text-ice-300/80">
-        Connect your Polkadot wallet to reserve a slot.
+      <GlassPanel tone="ink" padding="md" className="space-y-4 text-center text-sm text-steel-200/80">
+        <p>Connect your Polkadot wallet to reserve a slot.</p>
+        <button type="button" onClick={connect} className="btn-brass w-full justify-center text-xs tracking-[0.35em]">
+          Connect Wallet
+        </button>
       </GlassPanel>
     );
   }
@@ -147,14 +154,19 @@ export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: S
         transition={reduceMotion ? undefined : { duration: 0.4 }}
         className="space-y-4"
       >
-        <GlassPanel depth="md" padding="lg" accent="plasma" className="text-center space-y-4">
-          <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Live session</p>
-          <div className="flex flex-col items-center gap-4">
+        <GlassPanel tone="neon" padding="lg" className="space-y-5 text-center text-chrome-50">
+          <p className="text-[0.6rem] font-data uppercase tracking-[0.4em] text-neon-cyan/80">Live session</p>
+          <div className="flex flex-col items-center gap-4 text-steel-100">
             <TimerDisplay durationSec={300} autoStart onComplete={endSession} />
-            <p className="text-xs text-ice-300/70">Server tracks precise duration for billing.</p>
-            <NeoButton variant="nova" onClick={endSession} disabled={isLoading}>
+            <p className="text-xs text-steel-200/75">Server tracks precise duration for billing.</p>
+            <button
+              type="button"
+              onClick={endSession}
+              disabled={isLoading}
+              className="inline-flex items-center justify-center rounded-full border border-neon-pink/50 bg-neon-pink/10 px-6 py-2 text-xs font-data uppercase tracking-[0.4em] text-neon-pink transition hover:bg-neon-pink/20 disabled:opacity-60"
+            >
               {isLoading ? "Ending..." : "End Session"}
-            </NeoButton>
+            </button>
           </div>
         </GlassPanel>
       </motion.div>
@@ -169,30 +181,30 @@ export function SessionControls({ boothId, expertId: _expertId, pricePerMin }: S
       className="space-y-4"
     >
       {error && (
-        <div className="rounded-2xl border border-status-danger/30 bg-status-danger/10 px-4 py-3 text-sm text-status-danger" aria-live="assertive">
+        <div
+          className="rounded-2xl border border-neon-pink/40 bg-neon-pink/10 px-4 py-3 text-sm text-neon-pink"
+          aria-live="assertive"
+        >
           {error}
         </div>
       )}
 
-      <GlassPanel depth="md" padding="lg" accent="graphite">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <GlassPanel tone="steel" padding="lg" className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-data uppercase tracking-[0.4em] text-mist-400">Five-minute consult</p>
-            <p className="font-data text-3xl text-plasma-300">
+            <p className="text-xs font-data uppercase tracking-[0.4em] text-steel-200/80">Five-minute consult</p>
+            <p className="font-data text-3xl text-chrome-50">
               {pricePerMin * 5}
-              <span className="text-base text-ice-300/70"> tokens</span>
+              <span className="text-base text-steel-200/70"> tokens</span>
             </p>
-            <p className="text-xs text-ice-300/70">{pricePerMin} tokens / min - mock escrow</p>
+            <p className="text-xs text-steel-200/70">{pricePerMin} tokens / min - mock escrow</p>
           </div>
-          <NeoButton onClick={startSession} disabled={isLoading}>
-            {isLoading ? "Starting..." : "Book Session"}
-          </NeoButton>
+          <ServoLever onPull={startSession} disabled={isLoading} loading={isLoading} ctaLabel="Book Session" />
         </div>
+        <p className="text-xs text-steel-200/70">
+          We&apos;ll prompt you to sign an attested review immediately after the call, keeping the trust loop alive.
+        </p>
       </GlassPanel>
-
-      <p className="text-xs text-ice-300/70">
-        We&apos;ll prompt you to sign an attested review immediately after the call, keeping the trust loop alive.
-      </p>
     </motion.div>
   );
 }

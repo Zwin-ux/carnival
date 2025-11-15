@@ -440,8 +440,15 @@ function createInMemoryDb() {
 
   reset();
 
+  const AttestationType = {
+    SESSION_COMPLETION: "SESSION_COMPLETION",
+    TRUST_MILESTONE: "TRUST_MILESTONE",
+    EXPERT_QUALIFICATION: "EXPERT_QUALIFICATION",
+  } as const;
+
   return {
     prisma,
+    AttestationType,
     __testing: {
       reset,
       getDefaults: () => state.defaults,
@@ -451,8 +458,8 @@ function createInMemoryDb() {
 
 jest.mock("@echoid/db", () => createInMemoryDb());
 
-jest.mock("@echoid/core", () => {
-  const actual = jest.requireActual("@echoid/core");
+jest.mock("../lib/crypto", () => {
+  const actual = jest.requireActual("../lib/crypto");
   return {
     ...actual,
     verifySignature: jest.fn(async () => true),

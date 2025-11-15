@@ -1,18 +1,19 @@
 import { Router } from "express";
-import { ZodError } from "zod";
+import { ZodError, z } from "zod";
 import * as DB from "@echoid/db";
-import * as Core from "@echoid/core";
-
-const { prisma } = DB;
-const {
-  hashPayload,
-  verifySignature,
-  VerifyHashSchema,
+import { hashPayload, verifySignature } from "../lib/crypto";
+import {
   createReviewMerkleTree,
   generateMerkleProof,
-  verifyMerkleProof,
   getBlockExplorerUrl,
-} = Core;
+  verifyMerkleProof,
+} from "../lib/merkle";
+
+const { prisma } = DB;
+
+const VerifyHashSchema = z.object({
+  hash: z.string().regex(/^0x[a-f0-9]+$/i, "Invalid hash format"),
+});
 
 export const verifyRouter = Router();
 
@@ -29,6 +30,7 @@ verifyRouter.get("/:hash", async (req, res, next) => {
         fromUser: {
           select: {
             id: true,
+            handle: true,
             displayName: true,
             walletAddress: true,
           },
@@ -36,6 +38,7 @@ verifyRouter.get("/:hash", async (req, res, next) => {
         toUser: {
           select: {
             id: true,
+            handle: true,
             displayName: true,
             walletAddress: true,
           },
@@ -91,11 +94,7 @@ verifyRouter.get("/:hash", async (req, res, next) => {
     const hashMatches = recomputedHash === review.payloadHash;
 
     // Re-verify signature
-    const signatureValid = await verifySignature(
-      review.payload,
-      review.signature,
-      review.fromUser.walletAddress
-    );
+    const signatureValid = await verifySignature(review.payload, review.signature, review.fromUser.walletAddress);
 
     // Determine overall verification status
     const verified = hashMatches && signatureValid;
@@ -173,12 +172,14 @@ verifyRouter.get("/:hash", async (req, res, next) => {
         comment: review.comment,
         createdAt: review.createdAt,
         from: {
-          displayName: review.fromUser.displayName,
-          walletAddress: review.fromUser.walletAddress,
+          handle: review.fromUser.handle,
+          displayName: review.fromUser.displayName ?? review.fromUser.handle,
+          address: review.fromUser.walletAddress,
         },
         to: {
-          displayName: review.toUser.displayName,
-          walletAddress: review.toUser.walletAddress,
+          handle: review.toUser.handle,
+          displayName: review.toUser.displayName ?? review.toUser.handle,
+          address: review.toUser.walletAddress,
         },
         booth: {
           title: review.session.booth.title,
