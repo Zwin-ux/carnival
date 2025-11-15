@@ -87,7 +87,7 @@ const BuilderPage = () => {
       >
         <div className="flex flex-col gap-8 md:grid md:grid-cols-[360px_minmax(0,1fr)] md:items-start md:gap-10">
           <div className="space-y-6">
-            <div className="rounded-3xl border border-white/5 bg-[#0A0A0F]/70 p-6 backdrop-blur-xl">
+            <div id="connect" className="rounded-3xl border border-white/5 bg-[#0A0A0F]/70 p-6 backdrop-blur-xl">
               <PolkadotConnect
                 onConnected={() => {
                   unlockGate("genesis-drop");
@@ -95,7 +95,7 @@ const BuilderPage = () => {
               />
             </div>
 
-            <div className="rounded-3xl border border-white/5 bg-[#0A0A0F]/70 p-6 backdrop-blur-xl">
+            <div id="avatar" className="rounded-3xl border border-white/5 bg-[#0A0A0F]/70 p-6 backdrop-blur-xl">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] text-[#00D1FF]/70">Preview</p>

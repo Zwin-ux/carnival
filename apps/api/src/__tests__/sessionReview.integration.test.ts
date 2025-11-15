@@ -487,36 +487,59 @@ const buildAuthHeader = () => {
   return `Bearer ${token}`;
 };
 
+const buildExpiredAuthHeader = () => {
+  const secret = process.env.AUTH_JWT_SECRET || "test-secret";
+  const client = defaults().client;
+  const token = jwt.sign(
+    {
+      walletAddress: client.walletAddress,
+      exp: Math.floor(Date.now() / 1000) - 60,
+    },
+    secret,
+    {
+      subject: client.id,
+      noTimestamp: true,
+    }
+  );
+  return `Bearer ${token}`;
+};
+
+const createCompletedSession = async (authHeader: string) => {
+  const boothId = defaults().booth.id;
+
+  const startRes = await request(app)
+    .post("/v1/sessions/start")
+    .set("Authorization", authHeader)
+    .send({ boothId, durationSec: 300 });
+
+  expect(startRes.status).toBe(201);
+  const sessionId = startRes.body.session.id as string;
+
+  const activateRes = await request(app)
+    .post("/v1/sessions/activate")
+    .set("Authorization", authHeader)
+    .send({ sessionId });
+
+  expect(activateRes.status).toBe(200);
+
+  const endRes = await request(app)
+    .post("/v1/sessions/end")
+    .set("Authorization", authHeader)
+    .send({ sessionId });
+
+  expect(endRes.status).toBe(200);
+
+  return sessionId;
+};
+
 describe("session completion + review verification", () => {
   beforeEach(() => {
     dbMock.__testing.reset();
   });
 
   it("anchors a review and returns merkle proof", async () => {
-    const boothId = defaults().booth.id;
     const authHeader = buildAuthHeader();
-
-    const startRes = await request(app)
-      .post("/v1/sessions/start")
-      .set("Authorization", authHeader)
-      .send({ boothId, durationSec: 300 });
-
-    expect(startRes.status).toBe(201);
-    const sessionId = startRes.body.session.id as string;
-
-    const activateRes = await request(app)
-      .post("/v1/sessions/activate")
-      .set("Authorization", authHeader)
-      .send({ sessionId });
-
-    expect(activateRes.status).toBe(200);
-
-    const endRes = await request(app)
-      .post("/v1/sessions/end")
-      .set("Authorization", authHeader)
-      .send({ sessionId });
-
-    expect(endRes.status).toBe(200);
+    const sessionId = await createCompletedSession(authHeader);
 
     const timestamp = Date.now();
     const client = defaults().client;
@@ -547,5 +570,50 @@ describe("session completion + review verification", () => {
     expect(verifyRes.body.merkle.anchored).toBe(true);
     expect(verifyRes.body.merkle.proof.verified).toBe(true);
     expect(verifyRes.body.merkle.merkleRoot).toMatch(/^0x/);
+  });
+
+  it("rejects review submission when auth token is expired", async () => {
+    const validAuth = buildAuthHeader();
+    const sessionId = await createCompletedSession(validAuth);
+    const expiredAuth = buildExpiredAuthHeader();
+
+    const reviewRes = await request(app)
+      .post("/v1/reviews")
+      .set("Authorization", expiredAuth)
+      .send({
+        sessionId,
+        rating: 5,
+        comment: "Token should fail",
+        timestamp: Date.now(),
+        signature: "0xdeadbeef",
+      });
+
+    expect(reviewRes.status).toBe(401);
+    expect(reviewRes.body.error).toBe("Authentication required");
+  });
+
+  it("returns validation details for malformed review payload", async () => {
+    const authHeader = buildAuthHeader();
+    const sessionId = await createCompletedSession(authHeader);
+
+    const reviewRes = await request(app)
+      .post("/v1/reviews")
+      .set("Authorization", authHeader)
+      .send({
+        sessionId,
+        rating: 10,
+        comment: "invalid rating",
+        timestamp: Date.now(),
+        signature: "",
+      });
+
+    expect(reviewRes.status).toBe(400);
+    expect(reviewRes.body.error).toBe("Validation failed");
+    expect(reviewRes.body.details).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: "rating" }),
+        expect.objectContaining({ path: "signature" }),
+      ])
+    );
   });
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Wallet2,
@@ -16,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { TicketButton } from "@/components/ui/ticket-button";
 import { BoothCard, BoothCardContent } from "@/components/ui/booth-card";
+import { FlowRail } from "@/components/flow/FlowRail";
 
 const easeOutExpo = [0.16, 1, 0.3, 1] as const;
 
@@ -28,18 +30,24 @@ const fadeUp = {
 const flows = [
   {
     title: "Connect Wallet",
-    description: "Link Polkadot.js extension, sign the midway ticket, and enter the carnival.",
+    description: "Link Polkadot.js once and get a signed midway ticket.",
     icon: Wallet2,
+    accent: "linear-gradient(90deg,#FF6FD8 0%,#C77DFF 100%)",
+    href: "/builder#connect",
   },
   {
     title: "Craft Avatar",
-    description: "Assemble layered traits, glow up your identity soul, and preview in real time.",
+    description: "Choose layered traits and preview updates instantly.",
     icon: Layers3,
+    accent: "linear-gradient(90deg,#C77DFF 0%,#7F5BFF 100%)",
+    href: "/builder#avatar",
   },
   {
     title: "Mint & Anchor",
-    description: "Upload to IPFS, hash metadata, and anchor on-chain for verifiable trust.",
+    description: "Hash metadata, upload to IPFS, and anchor proofs on-chain.",
     icon: CircuitBoard,
+    accent: "linear-gradient(90deg,#00D1FF 0%,#5BC0FF 100%)",
+    href: "/dashboard#anchor",
   },
 ];
 
@@ -62,130 +70,111 @@ const features = [
 ];
 
 const stats = [
-  { label: "Deterministic Traits", value: "15", accent: "bg-[#C77DFF]/40" },
-  { label: "Quest Tracks", value: "12", accent: "bg-[#00D1FF]/40" },
-  { label: "Latency Budget", value: "<150ms", accent: "bg-[#89F7FE]/30" },
+  { label: "Deterministic Traits", value: "15", accent: "from-[#FF6FD8] to-[#C77DFF]" },
+  { label: "Quest Tracks", value: "12", accent: "from-[#00D1FF] to-[#5BC0FF]" },
+  { label: "Latency Budget", value: "<150ms", accent: "from-[#00D1FF] to-[#C77DFF]" },
 ];
 
 export default function Home() {
-  return (
-    <div className="relative isolate space-y-28 pb-28">
-      <div className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(55%_55%_at_50%_0%,rgba(199,125,255,0.45),rgba(10,10,15,0))]" aria-hidden />
+  const handleScrollToFlow = useCallback(() => {
+    const section = document.getElementById("flow");
+    section?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
-      <section className="px-6 pt-20 md:pt-28">
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050014] via-[#02000A] to-[#000008] text-white">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,#3b0c5c,transparent_60%)] opacity-70" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom,#001b30,transparent_50%)] opacity-80" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 opacity-10"
+        aria-hidden
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)",
+          backgroundSize: "90px 90px",
+        }}
+      />
+
+      <section className="relative isolate flex min-h-screen flex-col justify-center px-6 pb-20 pt-28 text-center sm:pb-24">
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: easeOutExpo }}
-          className="mx-auto max-w-5xl text-center"
+          className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12"
         >
-          <Badge className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-xs uppercase tracking-[0.3em] text-[#00D1FF] shadow-[0_0_16px_rgba(0,209,255,0.35)]">
+          <Badge className="flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-2 text-[11px] uppercase tracking-[0.35em] text-[#00D1FF] shadow-[0_0_16px_rgba(0,209,255,0.35)]">
             <span className="h-2 w-2 animate-pulse rounded-full bg-[#00D1FF]" />
-            Polkadot Powered
+            Polkadot Native Trust
           </Badge>
 
-          <div className="space-y-6">
-            <h1 className="font-heading text-4xl font-semibold leading-tight text-white md:text-6xl">
-              Identity is your midway.
-              <span className="block bg-[linear-gradient(135deg,#C77DFF_0%,#00D1FF_100%)] bg-clip-text text-transparent">
-                Bonelli ID keeps the lights on.
-              </span>
-            </h1>
-            <p className="font-body mx-auto max-w-3xl text-base text-white/70 md:text-lg">
-              Connect your Polkadot wallet, sculpt a luminous avatar, and earn reputation through quests, attestations, and on-chain anchors. Bonelli ID turns decentralized identity into a neon carnival of trust.
-            </p>
+          <div className="relative w-full max-w-4xl">
+            <div className="absolute -inset-12 mx-auto h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,#5B2FFF,transparent_65%)] opacity-70 blur-[150px]" aria-hidden />
+            <div className="relative rounded-[36px] border border-white/10 bg-white/5/10 px-8 py-12 shadow-[0_30px_120px_rgba(5,0,30,0.75)] backdrop-blur-3xl sm:px-12">
+              <h1 className="font-heading text-[2.75rem] font-semibold leading-tight text-white md:text-6xl lg:text-[4.75rem]">
+                Identity is your midway.
+                <span className="block bg-[linear-gradient(135deg,#C77DFF_0%,#00D1FF_100%)] bg-clip-text text-transparent">
+                  Bonelli Identity keeps the lights on.
+                </span>
+              </h1>
+              <p className="font-body mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/80 md:text-[1.25rem]">
+                Connect your Polkadot wallet, create an avatar, and anchor proofs in one run. Simple steps, same trusted tooling.
+              </p>
+              <div className="mt-10 flex flex-col items-center justify-center gap-5 sm:flex-row">
+                <TicketButton
+                  asChild
+                  variant="primary"
+                  size="lg"
+                  className="rounded-full px-10 text-base shadow-[0_0_30px_rgba(199,125,255,0.45)] transition hover:scale-[1.02]"
+                >
+                  <Link href="/builder">Enter the Builder</Link>
+                </TicketButton>
+                <button
+                  type="button"
+                  onClick={handleScrollToFlow}
+                  className="group inline-flex items-center gap-2 rounded-full border border-[#00D1FF]/40 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 shadow-[0_0_30px_rgba(0,209,255,0.25)] transition hover:scale-[1.02] hover:border-[#00D1FF]/70 hover:text-white"
+                  aria-label="Scroll to see how the Bonelli Identity flow works"
+                >
+                  Explore the Flow
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <TicketButton
-              variant="primary"
-              size="lg"
-              onClick={() => (window.location.href = "/builder")}
-            >
-              Enter the Builder
-            </TicketButton>
-            <Link
-              href="#flow"
-              className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white/70 transition hover:border-white/30 hover:text-white"
-              aria-label="Scroll to see how the Bonelli Identity flow works"
-            >
-              Explore the Flow
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-            </Link>
-          </div>
-
-          <div className="mt-12 grid gap-6 rounded-3xl border border-white/5 bg-white/5/10 p-6 backdrop-blur-xl sm:grid-cols-3">
+          <div className="grid w-full max-w-5xl gap-4 rounded-[32px] border border-white/10 bg-[#050111]/70 p-6 backdrop-blur-2xl sm:p-8 md:grid-cols-3">
             {stats.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center gap-2 text-sm text-white/60">
-                <span className={`rounded-full px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/70 ${stat.accent}`}>
+              <div key={stat.label} className="flex flex-col items-center gap-3 text-center">
+                <span className={`inline-flex rounded-full bg-gradient-to-r ${stat.accent} px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/85`}>
                   {stat.label}
                 </span>
-                <p className="font-heading text-2xl font-semibold text-white">
-                  {stat.value}
-                </p>
+                <p className="font-heading text-2xl md:text-[2.4rem]">{stat.value}</p>
               </div>
             ))}
           </div>
         </motion.div>
       </section>
 
-      <section id="flow" className="relative px-6">
-        <motion.div
-          className="mx-auto max-w-6xl rounded-3xl border border-white/5 bg-[#0A0A0F]/60 p-10 backdrop-blur-2xl shadow-[0_40px_120px_rgba(0,0,0,0.45)]"
-          {...fadeUp}
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          <div className="mx-auto mb-12 max-w-3xl text-center">
-            <h2 className="font-heading text-3xl font-semibold text-white md:text-4xl">
-              Wallet to Avatar to Anchor—without leaving the midway.
-            </h2>
-            <p className="font-body mt-4 text-white/65">
-              Every booth glows when you complete a step. Segués with spring easing keep the experience cinematic while staying performant.
-            </p>
-          </div>
+      <FlowRail steps={flows} />
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {flows.map(({ title, description, icon: Icon }) => (
-                <motion.div
-                  key={title}
-                  className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5/10 p-6 text-left shadow-[0_20px_50px_rgba(199,125,255,0.12)]"
-                  whileHover={{ y: -6 }}
-                  transition={{ duration: 0.35, ease: easeOutExpo }}
-              >
-                <span className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#C77DFF_0%,#00D1FF_100%)]/70 text-white">
-                  <Icon className="h-6 w-6" />
-                </span>
-                <h3 className="font-heading text-xl font-semibold text-white">
-                  {title}
-                </h3>
-                <p className="font-body mt-3 text-sm text-white/65">
-                  {description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      <section id="features" className="px-6">
+      <section id="features" className="px-6 py-24">
         <motion.div
           className="mx-auto max-w-6xl"
           {...fadeUp}
           viewport={{ once: true, amount: 0.25 }}
         >
           <div className="mb-12 grid gap-6 md:grid-cols-[1fr_1.2fr]">
-            <div className="rounded-3xl border border-white/5 bg-white/5/15 p-8 backdrop-blur-xl">
-              <span className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-[#00D1FF]/70">
+            <div className="rounded-3xl border border-white/10 bg-white/5/15 p-10 shadow-[0_30px_90px_rgba(5,0,30,0.45)] backdrop-blur-2xl">
+              <span className="flex items-center gap-2 text-[11px] uppercase tracking-[0.35em] text-[#00D1FF]">
                 <Activity className="h-4 w-4" />
                 Cinematic UX Stack
               </span>
-              <h2 className="font-heading mt-5 text-3xl font-semibold text-white">
+              <h2 className="font-heading mt-6 text-[2.25rem] font-semibold text-white">
                 Neon glassmorphism, particle fields, and deterministic trait minting.
               </h2>
-              <p className="font-body mt-4 text-white/65">
+              <p className="font-body mt-5 text-base leading-relaxed text-white/75 md:text-lg">
                 Bonelli ID fuses shadcn/ui with Tailwind v4 tokens. Every component respects reduced-motion preferences, keeps contrast accessible, and renders under 150 ms interactions.
               </p>
-              <div className="font-body mt-6 flex flex-wrap gap-3 text-sm text-white/60">
+              <div className="font-body mt-7 flex flex-wrap gap-3 text-xs uppercase tracking-[0.25em] text-white/60">
                 <span className="rounded-full border border-white/15 px-4 py-2">Framer Motion v12</span>
                 <span className="rounded-full border border-white/15 px-4 py-2">Zustand orchestrations</span>
                 <span className="rounded-full border border-white/15 px-4 py-2">Tailwind v4 tokens</span>
@@ -195,15 +184,15 @@ export default function Home() {
 
             <div className="grid gap-5 sm:grid-cols-2">
               {features.map(({ title, description, icon: Icon }) => (
-                <BoothCard key={title} awning awningColor="violet" glow className="border-white/10 bg-[#0A0A0F]/70 p-6">
+                <BoothCard key={title} awning awningColor="violet" glow className="border-white/10 bg-[#070217]/80 p-6 shadow-[0_20px_60px_rgba(5,0,30,0.45)]">
                   <BoothCardContent className="space-y-4 text-left">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white">
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-white">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <h3 className="font-heading text-lg font-semibold text-white">
+                    <h3 className="font-heading text-xl font-semibold text-white">
                       {title}
                     </h3>
-                    <p className="font-body text-sm text-white/65">
+                    <p className="font-body text-base text-white/70">
                       {description}
                     </p>
                   </BoothCardContent>
@@ -214,33 +203,34 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section className="px-6">
+      <section className="px-6 pb-32">
         <motion.div
-          className="mx-auto flex max-w-5xl flex-col gap-10 rounded-3xl border border-white/5 bg-[#0A0A0F]/70 p-12 text-center backdrop-blur-xl"
+          className="mx-auto flex max-w-5xl flex-col gap-10 rounded-3xl border border-white/10 bg-[#050212]/85 p-12 text-center shadow-[0_30px_100px_rgba(5,0,30,0.5)] backdrop-blur-2xl"
           {...fadeUp}
           viewport={{ once: true, amount: 0.3 }}
         >
           <div className="flex flex-col items-center gap-4">
             <Star className="h-10 w-10 text-[#C77DFF]" />
-            <h2 className="font-heading text-3xl font-semibold text-white md:text-4xl">
+            <h2 className="font-heading text-[2.25rem] font-semibold text-white md:text-[2.75rem]">
               Ready for hackathons. Poised for mainnet.
             </h2>
-            <p className="font-body max-w-3xl text-sm text-white/65 md:text-base">
-              Run the SKG Forge pipeline to generate layered PNG traits deterministically, mint avatars to IPFS, and anchor hashes without exposing keys. The midway glow you see here ships with the repo.
+            <p className="font-body max-w-3xl text-base text-white/70 md:text-lg">
+              Generate layered PNG traits, push them to IPFS, and anchor the hashes with the same signer flow. The repo ships with every piece you see here.
             </p>
           </div>
 
           <div className="mx-auto flex w-full flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <TicketButton
+              asChild
               variant="secondary"
               size="lg"
-              onClick={() => (window.location.href = "/dashboard")}
+              className="rounded-full border border-white/20 bg-white/90 px-10 text-base text-[#050212] shadow-[0_0_35px_rgba(255,255,255,0.2)] transition hover:scale-[1.02]"
             >
-              Open the Prize Counter
+              <Link href="/dashboard">Open the Prize Counter</Link>
             </TicketButton>
             <Link
               href="/quests"
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-white/70 transition hover:text-white"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 transition hover:border-white/40 hover:text-white"
             >
               View Daily Quests
               <ArrowRight className="h-4 w-4" />
@@ -248,6 +238,6 @@ export default function Home() {
           </div>
         </motion.div>
       </section>
-    </div>
+    </main>
   );
 }

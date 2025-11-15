@@ -1,6 +1,6 @@
 "use client";
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProfileForm from "@/components/ProfileForm";
 import { DailyLoginModal } from "@/components/DailyLoginModal";
 import { Wallet, User, Anchor, Eye, Plus, Home, BarChart3, Award, Shield, Clock, TrendingUp, Activity, CheckCircle, XCircle, AlertCircle, Ticket, Trophy, Target, Zap } from "lucide-react";
@@ -31,6 +31,22 @@ export default function Dashboard() {
   const [profileSnapshot, setProfileSnapshot] = useState<any>(null);
   const [trustScore, setTrustScore] = useState(0);
   const [showDailyLogin, setShowDailyLogin] = useState(false);
+  const [tabValue, setTabValue] = useState<string>("overview");
+  const tabIds = useMemo(() => ["overview", "profile", "attestations", "anchor"], []);
+
+  useEffect(() => {
+    const syncTabFromHash = () => {
+      if (typeof window === "undefined") return;
+      const hash = window.location.hash.replace("#", "");
+      if (hash && tabIds.includes(hash)) {
+        setTabValue(hash);
+      }
+    };
+
+    syncTabFromHash();
+    window.addEventListener("hashchange", syncTabFromHash);
+    return () => window.removeEventListener("hashchange", syncTabFromHash);
+  }, [tabIds]);
 
   useEffect(() => {
     // Simulate trust score calculation
@@ -114,7 +130,18 @@ export default function Dashboard() {
         {/* Tabbed Interface */}
         {account && (
           <motion.div {...fadeInUp} transition={{ delay: 0.2 }}>
-            <Tabs defaultValue="overview" className="w-full">
+            <Tabs
+              value={tabValue}
+              onValueChange={(nextValue) => {
+                setTabValue(nextValue);
+                if (typeof window !== "undefined") {
+                  const targetHash = nextValue === "overview" ? "" : `#${nextValue}`;
+                  const url = `${window.location.origin}/dashboard${targetHash}`;
+                  window.history.replaceState(null, "Dashboard", url);
+                }
+              }}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid mb-8 bg-carnival-canvas/80 border-2 border-carnival-twist/30 p-2">
                 <TabsTrigger 
                   value="overview" 
@@ -592,7 +619,7 @@ export default function Dashboard() {
               </TabsContent>
 
               {/* Anchor Tab */}
-              <TabsContent value="anchor" className="space-y-6">
+              <TabsContent id="anchor" value="anchor" className="space-y-6">
                 {profileSnapshot ? (
                   <Card>
                     <CardHeader>
