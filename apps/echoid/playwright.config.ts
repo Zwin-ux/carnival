@@ -22,5 +22,6 @@ export default defineConfig({
     url: "http://localhost:3100",
     reuseExistingServer: !process.env.CI,
     cwd: __dirname,
+    timeout: 120 * 1000,
   },
 });
