@@ -1,0 +1,293 @@
+generator client {
+  provider = "prisma-client-js"
+  // URL removed from here as it's not needed in the generator block
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model WheelMetric {
+  id     Int     @id @default(autoincrement())
+  filter String  @default("all")
+  spins  Int     @default(0)
+  visits Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([filter])
+}
+
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique @map("address")
+  handle        String   @unique
+  displayName   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bio    String?
+  avatar String?
+  skills String[] @default([])
+  tags   String[] @default([])
+
+  trustScore  Float @default(50.0)
+  reviewCount Int   @default(0)
+
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  coins         Int      @default(0)
+  streak        Int      @default(0)
+  lastLoginDate DateTime?
+  theme         String?  @default("default")
+  petType       String?
+  petLevel      Int      @default(1)
+
+  lastAnchorTx  String?
+  lastAnchorBlk Int?
+  hashHex       String?
+
+  booths           Booth[]
+  authoredSessions Session[] @relation("SessionAuthor")
+  targetedSessions Session[] @relation("SessionTarget")
+  authoredReviews  Review[]  @relation("ReviewFromUser")
+  receivedReviews  Review[]  @relation("ReviewToUser")
+
+  achievements  Achievement[]
+  questProgress UserQuest[]
+  gameScores    GameScore[]
+  inventory     InventoryItem[]
+  friendsFrom   Friend[]      @relation("UserFriends")
+  friendsTo     Friend[]      @relation("FriendUser")
+
+  @@index([trustScore])
+  @@index([reviewCount])
+  @@index([xp])
+  @@index([level])
+  @@index([handle])
+  @@index([lastAnchorBlk])
+  @@index([createdAt])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String // Changed from profileId to userId
+  badgeType   String
+  rarity      String   @default("common")
+  earnedAt    DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Changed from profile to user
+
+  @@index([userId])
+  @@index([badgeType])
+}
+
+model Quest {
+  id          String    @id @default(cuid())
+  type        String
+  title       String
+  description String
+  requirement Json
+  reward      Json
+  icon        String
+  active      Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  userProgress UserQuest[]
+
+  @@index([type])
+  @@index([active])
+  @@index([createdAt])
+}
+
+model UserQuest {
+  id          String    @id @default(cuid())
+  userId      String // Changed from profileId to userId
+  questId     String
+  progress    Int       @default(0)
+  completed   Boolean   @default(false)
+  claimed     Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Changed from profile to user
+  quest       Quest    @relation(fields: [questId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([questId])
+  @@unique([userId, questId])
+}
+
+model GameScore {
+  id          String   @id @default(cuid())
+  userId      String // Changed from profileId to userId
+  game        String
+  score       Int
+  metadata    Json?
+  playedAt    DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Changed from profile to user
+
+  @@index([userId])
+  @@index([game, score])
+}
+
+model InventoryItem {
+  id          String   @id @default(cuid())
+  userId      String // Changed from profileId to userId
+  itemType    String
+  itemId      String
+  equipped    Boolean  @default(false)
+  purchasedAt DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Changed from profile to user
+
+  @@index([userId])
+  @@index([itemType])
+}
+
+model Friend {
+  id          String   @id @default(cuid())
+  userId      String
+  friendId    String
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+
+  user        User     @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+  friend      User     @relation("FriendUser", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([friendId])
+  @@unique([userId, friendId])
+}
+
+model Booth {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  pricePerMin Int
+  active      Boolean  @default(true)
+  tags        String[] @default([])
+  imageUrl    String?
+  trustScore  Float    @default(75.0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  sessions    Session[]
+
+  @@index([ownerId])
+  @@index([slug])
+  @@index([pricePerMin])
+  @@index([trustScore])
+  @@index([active])
+  @@index([createdAt])
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  boothId     String
+  clientId    String
+  expertId    String
+  status      SessionStatus @default(PENDING)
+  startedAt   DateTime?
+  endedAt     DateTime?
+  durationSec Int      @default(300)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // KILT Attestation related
+  attestationCtypeHash String? // CType hash for the attestation
+  attestationClaimHash String? // Claim hash for the attestation
+  attestationTxHash    String? // Transaction hash for the attestation on KILT
+
+  // Relations
+  booth       Booth    @relation(fields: [boothId], references: [id])
+  client      User     @relation("SessionAuthor", fields: [clientId], references: [id])
+  expert      User     @relation("SessionTarget", fields: [expertId], references: [id])
+  review      Review?
+
+  @@index([boothId])
+  @@index([clientId])
+  @@index([expertId])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  sessionId   String   @unique
+  fromUserId  String
+  toUserId    String
+  rating      Int      // 1-5 stars
+  comment     String?
+  payload     String   // Canonical JSON representation of the review for signature verification
+  signature   String   // Cryptographic signature of the review payload
+  payloadHash String   @unique // SHA-256 hash of the canonical review payload
+  anchorTxHash String? // Transaction hash if anchored on-chain
+  verified    Boolean  @default(true) // Whether the signature has been verified
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  session     Session  @relation(fields: [sessionId], references: [id])
+  fromUser    User     @relation("ReviewFromUser", fields: [fromUserId], references: [id])
+  toUser      User     @relation("ReviewToUser", fields: [toUserId], references: [id])
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([rating])
+  @@index([createdAt])
+}
+
+enum SessionStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELED
+  EXPIRED
+}
+
+model MerkleAnchor {
+  id          String   @id @default(cuid())
+  merkleRoot  String   @unique
+  blockNumber Int?
+  txHash      String?
+  leafCount   Int
+  reviewHashes String[]
+  createdAt   DateTime @default(now())
+}
+
+model Attestation {
+  id             String   @id @default(cuid())
+  attestationId  String   @unique
+  type           AttestationType
+  subjectAddress String
+  claimData      String
+  issuerAddress  String?
+  blockNumber    Int?
+  txHash         String?
+  verified       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model AuthChallenge {
+  nonce         String   @id
+  walletAddress String
+  message       String
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([walletAddress])
+}
+
+enum AttestationType {
+  EXPERT_QUALIFICATION
+  SESSION_COMPLETION
+  TRUST_MILESTONE
+}

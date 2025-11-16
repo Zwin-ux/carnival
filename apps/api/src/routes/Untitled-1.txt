@@ -1,0 +1,15 @@
+import sql from '../src/sql.js'; // adjust path and extension as needed
+
+async function main() {
+  try {
+    const r = await sql`SELECT 1 as result`;
+    console.log('OK', r);
+    process.exit(0);
+  } catch (err) {
+    console.error('CONN ERROR', err);
+    process.exit(1);
+  } finally {
+    await sql.end({ timeout: 5 });
+  }
+}
+main();

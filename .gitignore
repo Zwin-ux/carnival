@@ -1,8 +1,15 @@
 # Dependencies
-node_modules
+node_modules/
 **/node_modules
 .pnp
-.pnp.js
+.pnp.*
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+.turbo/
 
 # Environment variables
 .env
@@ -10,32 +17,9 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+.env*.local
 .env.backup
 .env.local.backup
-
-# Next.js
-.next/
-out/
-build
-dist
-
-# Production
-/build
-
-# Misc
-.DS_Store
-*.pem
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Debug
-lerna-debug.log*
-
-# Local env files
-.env*.local
 
 # Vercel
 .vercel
@@ -64,9 +48,22 @@ cargo-target/
 .DS_Store
 Thumbs.db
 
-# Test coverage
-coverage/
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Temporary files
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+temp/
+tmp/
 nul
 *.tmp

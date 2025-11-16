@@ -1,0 +1,33 @@
+# Dockerfile.local — build image from pre-built artifacts (apps/api/dist)
+# This Dockerfile assumes you have already built `apps/api/dist` on the host
+# (i.e. run `pnpm --filter @echoid/api build`) and that you want the image to
+# install production dependencies and generate the Prisma client inside the image.
+
+FROM node:20-bullseye-slim AS runner
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy workspace metadata and the db package.json so production install pulls runtime deps
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY packages/db/package.json ./packages/db/
+
+# Install only production deps (this installs @prisma/client and other runtime deps)
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/* \
+  && pnpm install --workspace-root --prod
+
+# Copy the db package (so prisma schema is present) and generate the Prisma client
+COPY packages/db ./packages/db
+RUN pnpm --filter @echoid/db db:generate
+
+# Copy pre-built API artifacts and needed package files
+COPY apps/api/dist ./apps/api/dist
+COPY apps/api/package.json ./apps/api/
+# Copy other workspace packages (if runtime code uses them at runtime)
+COPY packages ./packages
+
+EXPOSE 3001
+CMD ["node", "apps/api/dist/index.js"]
