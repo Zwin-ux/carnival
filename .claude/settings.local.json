@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm prisma generate:*)",
+      "Bash(taskkill /F /PID 37148)",
+      "Bash(taskkill /F /PID 37148 2)",
+      "Bash(NUL)",
+      "Bash(taskkill:*)",
+      "Bash(pnpm list:*)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(pnpm run build)",
+      "Bash(timeout 120 pnpm run build:*)",
+      "Bash(timeout 180 pnpm run build:*)",
+      "Bash(cd:*)",
+      "Bash(git log:*)",
+      "Bash(if exist prisma rmdir /s /q prisma)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm db:generate:*)",
+      "Bash(pnpm db:push:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(echo:*)",
+      "Bash(set:*)",
+      "Bash(.env)",
+      "Bash(printf:*)",
+      "Bash(pnpm --filter @echoid/db exec prisma db push:*)",
+      "Bash(docker compose:*)",
+      "Bash(tree:*)",
+      "Bash(npx tsc --noEmit)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
